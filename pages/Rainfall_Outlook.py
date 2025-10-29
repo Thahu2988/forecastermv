@@ -1,3 +1,5 @@
+from config import app_setup
+app_setup("Forecasters' Tools")
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -125,4 +127,5 @@ st.download_button(
     file_name='rainfall_outlook_map.png',
     mime='image/png'
 )
+
 
