@@ -6,7 +6,7 @@ import yaml
 from yaml.loader import SafeLoader
 
 # ------------------------------------------------
-# 1. PAGE CONFIGURATION (MUST BE FIRST ST. COMMAND)
+# 1. PAGE CONFIGURATION (MUST BE THE FIRST ST. COMMAND)
 # ------------------------------------------------
 st.set_page_config(
     page_title="Forecasters' Tools",
@@ -26,12 +26,12 @@ st.set_page_config(
 # ------------------------------------------------
 
 # ⚠️ WARNING: REPLACE THIS HASH WITH A REAL ONE GENERATED FOR YOUR PASSWORD
-# Example uses 'metmdv' as the username
+# The password must be HASHED.
 hashed_passwords = ['$2b$12$ABCDEFGHIJKLMNO.PQRSTUVWXYZ.EXAMPLE.HASH.DO.NOT.USE'] 
 
 authenticator = stauth.Authenticate(
     names=['MMS Forecaster'],
-    # Use 'metmdv' as the username corresponding to the email metmdv@gmail.com
+    # Use 'metmdv' as the username
     usernames=['metmdv'],
     passwords=hashed_passwords,
     cookie_name='forecaster_cookie',
@@ -40,7 +40,6 @@ authenticator = stauth.Authenticate(
 )
 
 # --- Check Login Status ---
-# Logs the user in via a form rendered in the main area of the page
 name, authentication_status, username = authenticator.login('Login', 'main')
 
 # ------------------------------------------------
