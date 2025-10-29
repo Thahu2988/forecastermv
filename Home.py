@@ -1,20 +1,27 @@
 # Home.py
+import os
 import streamlit as st
 import streamlit.components.v1 as components
 
 # ---------------------------
-# 1. PAGE CONFIG
+# 0. Defensive: wrap set_page_config to avoid Cloud crashes
 # ---------------------------
-st.set_page_config(
-    page_title="Forecasters' Tools",
-    page_icon="🗺️",
-    layout="wide"
-)
+try:
+    st.set_page_config(
+        page_title="Forecasters' Tools",
+        page_icon="🗺️",
+        layout="wide"
+    )
+    _page_config_ok = True
+except Exception as e:
+    # If set_page_config fails (some Cloud environments restrict or raise),
+    # keep going but surface a helpful message to the developer in the UI.
+    _page_config_ok = False
+    _page_config_error = str(e)
 
 # ---------------------------
-# 2. CSS + HEADER (via components.html to avoid unsafe_allow_html)
+# 1. Header + CSS via components.html
 # ---------------------------
-# Using components.html avoids problems with deprecated/changed st.markdown kwargs.
 HEADER_HTML = """
 <style>
 /* Hide default Streamlit menu + footer */
@@ -38,7 +45,7 @@ header {visibility: hidden;}
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
-/* Logout link (position inside header) */
+/* Logout link placeholder (visual only) */
 .logout-link {
     position: absolute;
     right: 20px;
@@ -78,19 +85,29 @@ div.stButton {
 
 <div class="main-header" id="mainHeader">
   Forecasters' Tools
-  <!-- the logout link is rendered and handled from Python side; this is just a visual anchor -->
   <span class="logout-link" id="logoutAnchor"></span>
 </div>
 """
 
-# Inject header and CSS (height small so it doesn't take large space)
+# components.html rarely fails on Cloud; small height to avoid big blank area.
 components.html(HEADER_HTML, height=10)
 
 # ---------------------------
-# 3. SIMPLE AUTH (session state)
+# 2. If set_page_config failed, show a visible banner for troubleshooting
 # ---------------------------
-# Demo credentials - change to your secure backend when ready
-USER_CREDENTIALS = {"forecaster": "mms123"}
+if not _page_config_ok:
+    st.warning(
+        "Note: `st.set_page_config()` raised an exception in this environment. "
+        "The app will still run, but page configuration was not applied. "
+        "If you're on Streamlit Cloud, check **Manage app → Logs** for the full error."
+    )
+    # Optional: show the short error for quick debugging (safe to reveal here)
+    st.caption(f"set_page_config error (short): {_page_config_error}")
+
+# ---------------------------
+# 3. Simple authentication (session-state)
+# ---------------------------
+USER_CREDENTIALS = {"forecaster": "mms123"}  # demo only — replace with secure backend
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -98,28 +115,33 @@ if "username" not in st.session_state:
     st.session_state.username = ""
 
 def do_login(username: str, password: str):
+    username = (username or "").strip()
     if username in USER_CREDENTIALS and USER_CREDENTIALS[username] == password:
         st.session_state.logged_in = True
         st.session_state.username = username
         # Rerun to load main UI
-        st.experimental_rerun()
+        try:
+            st.experimental_rerun()
+        except Exception:
+            # fallback: just continue and let UI refresh naturally
+            pass
     else:
         st.error("Invalid username or password")
 
 def do_logout():
-    # Clear only the auth-related items to preserve other state if needed
     st.session_state.logged_in = False
     st.session_state.username = ""
-    # Rerun to show login page
-    st.experimental_rerun()
+    try:
+        st.experimental_rerun()
+    except Exception:
+        pass
 
 # ---------------------------
 # 4. LOGIN PAGE
 # ---------------------------
 if not st.session_state.logged_in:
-    # Center the login box vertically using empty space (simple approach)
+    # Vertical spacing
     st.markdown("<div style='height:40px'></div>", unsafe_allow_html=True)
-
     st.markdown("<h2 style='text-align:center;'>🔒 Forecasters' Tools — Sign In</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center; margin-top:-10px;'>Please sign in to access MMS tools.</p>", unsafe_allow_html=True)
 
@@ -128,33 +150,29 @@ if not st.session_state.logged_in:
         password = st.text_input("Password", type="password", key="form_password")
         submitted = st.form_submit_button("Sign In")
         if submitted:
-            do_login(username.strip(), password)
+            do_login(username, password)
 
-    # Helpful demo credentials note (remove in production)
     st.info("Demo credentials — Username: `forecaster`  Password: `mms123`")
-
-    # Stop further execution until logged in
     st.stop()
 
 # ---------------------------
-# 5. MAIN APP AFTER LOGIN
+# 5. MAIN APP (after login)
 # ---------------------------
 
-# Render a small logout button at top-right by showing a link-like button in the layout.
-# (We can't directly hook the HTML logoutAnchor link to Python easily, so show a button.)
+# Show a small logout button at top-right region (invisible headerAnchor not easily hookable)
 header_cols = st.columns([1, 9, 1])
 with header_cols[2]:
     if st.button(f"Log Out ({st.session_state.username})"):
         do_logout()
 
-# Main content layout (center column for buttons)
+# Buttons layout
 col_left, col_center, col_right = st.columns([1, 2, 1])
 
 with col_center:
     st.markdown("<h3 style='text-align: center; margin-top: 8px;'>Select a Tool from the Sidebar Menu on the Left</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # The buttons below are placeholders — connect them to pages or callbacks as you need.
+    # Buttons (wire these to pages or callbacks later)
     if st.button("Tide Chart"):
         st.info("Tide Chart clicked — wire this to a page or callback.")
     if st.button("Alert Graphic"):
@@ -173,5 +191,5 @@ with col_center:
     st.markdown("---")
     st.info("Your custom map tools are available as **'Rainfall Outlook'** and **'Temperature Outlook'** in the sidebar menu (add them under pages/ or via sidebar components).")
 
-# Optional: small footer logout link
+# Small footer logout link
 st.markdown("<br><center><a href='#' style='color:#1E90FF;' onclick='window.location.reload();'>🔓 Log Out</a></center>", unsafe_allow_html=True)
