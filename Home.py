@@ -1,4 +1,6 @@
 # Home.py
+from config import app_setup
+app_setup("Forecasters' Tools")
 import os
 import streamlit as st
 import streamlit.components.v1 as components
@@ -177,3 +179,4 @@ with col_center:
     st.info("Your custom map tools are available as **'Rainfall Outlook'** and **'Temperature Outlook'** in the sidebar.")
 
 st.markdown("<br><center><a href='#' style='color:#1E90FF;' onclick='window.location.reload();'>🔓 Log Out</a></center>", unsafe_allow_html=True)
+
