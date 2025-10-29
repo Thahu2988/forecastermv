@@ -2,21 +2,22 @@
 
 import streamlit as st
 
-# 1. Set the page configuration
 st.set_page_config(
     page_title="Forecasters' Tools",
     page_icon="🗺️",
-    layout="wide"
+    layout="wide",
+    # CRITICAL: Hides the hamburger menu (View App, Settings, About) 
+    # This prevents users from easily viewing app settings or source code.
+    menu_items={'About': 'Developed by Maldives Meteorological Service (MMS)', 
+                'Get Help': None, 
+                'Report a bug': None} 
 )
 
-# 2. Inject Custom CSS for the Blue Header and Centered Buttons
-# This CSS attempts to mimic the exact look of your image.
+# 2. Inject Custom CSS for the Blue Header Bar and Button Styling
 st.markdown(
     """
     <style>
-    /* ------------------------------------------- */
-    /* 1. CUSTOM BLUE HEADER BAR */
-    /* Fix the header to the top of the screen */
+    /* CUSTOM BLUE HEADER BAR */
     .main-header {
         background-color: #1E90FF; /* Bright Blue */
         color: white;
@@ -28,7 +29,7 @@ st.markdown(
         top: 0;
         left: 0;
         width: 100%;
-        z-index: 1000; 
+        z-index: 1000;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
     
@@ -36,8 +37,6 @@ st.markdown(
     .st-emotion-cache-1g8i5u7, .st-emotion-cache-6qob1r, .st-emotion-cache-1y4pm5r {
         padding-top: 80px; 
     }
-    
-    /* Optional: Small 'Log Out' text on the right */
     .logout-link {
         position: absolute;
         right: 20px;
@@ -46,18 +45,12 @@ st.markdown(
         color: white;
         text-decoration: none;
     }
-    /* ------------------------------------------- */
-
-
-    /* 2. CUSTOM BUTTON STYLING (Centered and Stacked) */
-    /* Center the button containers */
+    /* CUSTOM BUTTON STYLING (Centered and Stacked) */
     div.stButton {
         display: flex;
         justify-content: center;
         margin-bottom: 5px; 
     }
-    
-    /* Style the actual button elements */
     .stButton > button {
         width: 250px;
         height: 40px;
@@ -71,33 +64,24 @@ st.markdown(
         background-color: #1E90FF;
         color: white;
     }
-
-    /* Hide the default Streamlit footer/menu icon */
-    .st-emotion-cache-1g8i5u7, .st-emotion-cache-6qob1r, .st-emotion-cache-1y4pm5r {
-        padding-top: 80px; /* Adjust top padding for fixed header */
-    }
-    .st-emotion-cache-1629p8f { /* Target the hamburger menu button */
-        display: none !important;
-    }
+    /* Hiding the default hamburger menu and file viewer icon is handled by menu_items above */
     </style>
     """, 
     unsafe_allow_html=True
 )
 
-# 3. Custom Header HTML to be displayed
+# Renders the fixed blue header bar with the title and a logout link
 st.markdown('<div class="main-header">Forecasters\' Tools <a href="#" class="logout-link">Log Out</a></div>', unsafe_allow_html=True)
 
-
-# 4. Main Page Content (Below the Header)
-# Use a centered column for the menu instructions and buttons
+# Main Page Content (Below the Header)
+# Use columns to center the buttons
 col_left, col_center, col_right = st.columns([1, 2, 1])
 
 with col_center:
-    # Instruction text
     st.markdown("<h3 style='text-align: center; margin-top: 20px;'>Select a Tool from the Sidebar Menu on the Left</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # The list of buttons from your image (Note: These are placeholders)
+    # Placeholder buttons matching the UI image
     st.button("Tide Chart")
     st.button("Alert Graphic")
     st.button("Forecast Graphic")
@@ -107,4 +91,5 @@ with col_center:
     st.button("Weather News")
     
     st.markdown("---")
-    st.info("Your custom map tools are now fully functional and accessible as **'Rainfall Outlook'** and **'Temperature Outlook'** in the Streamlit sidebar menu.")
+    # This info message guides the user to the pages folder scripts
+    st.info("Your custom map tools are now available as **'Rainfall Outlook'** and **'Temperature Outlook'** in the Streamlit sidebar menu.")
