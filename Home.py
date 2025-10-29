@@ -1,137 +1,91 @@
 # Home.py
 
 import streamlit as st
-import streamlit_authenticator as stauth
-import yaml
-from yaml.loader import SafeLoader
 
-# ------------------------------------------------
-# 1. PAGE CONFIGURATION (MUST BE THE FIRST ST. COMMAND)
-# ------------------------------------------------
 st.set_page_config(
     page_title="Forecasters' Tools",
     page_icon="🗺️",
     layout="wide",
+    # CRITICAL: Hides the hamburger menu (Settings/About) 
     menu_items={'About': 'Developed by Maldives Meteorological Service (MMS)', 
                 'Get Help': None, 
                 'Report a bug': None},
+    # CRITICAL: Hides the GitHub Icon, Edit Icon, and Star Icon toolbar (the icons you pointed out)
     show_toolbar_by_default=False 
 )
 
-
-# ------------------------------------------------
-# 2. AUTHENTICATION SETUP 
-# ------------------------------------------------
-
-# ⚠️ WARNING: REPLACE THIS HASH WITH A REAL ONE GENERATED FOR YOUR PASSWORD
-hashed_passwords = ['$2b$12$ABCDEFGHIJKLMNO.PQRSTUVWXYZ.EXAMPLE.HASH.DO.NOT.USE'] 
-
-authenticator = stauth.Authenticate(
-    names=['MMS Forecaster'],
-    usernames=['metmdv'],
-    passwords=hashed_passwords,
-    cookie_name='forecaster_cookie',
-    key='random_auth_key',
-    cookie_expiry_days=30
+# 2. Inject Custom CSS for the Blue Header Bar and Button Styling
+st.markdown(
+    """
+    <style>
+    /* CUSTOM BLUE HEADER BAR */
+    .main-header {
+        background-color: #1E90FF; /* Bright Blue */
+        color: white;
+        padding: 10px 0;
+        text-align: center;
+        font-size: 28px;
+        font-weight: bold;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Push main content down to account for the fixed header */
+    .st-emotion-cache-1g8i5u7, .st-emotion-cache-6qob1r, .st-emotion-cache-1y4pm5r {
+        padding-top: 80px; 
+    }
+    .logout-link {
+        position: absolute;
+        right: 20px;
+        top: 15px;
+        font-size: 14px;
+        color: white;
+        text-decoration: none;
+    }
+    /* CUSTOM BUTTON STYLING (Centered and Stacked) */
+    div.stButton {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 5px; 
+    }
+    .stButton > button {
+        width: 250px;
+        height: 40px;
+        margin: 5px 0;
+        font-size: 16px;
+        border: 1px solid #1E90FF; 
+        color: #1E90FF;
+        background-color: white;
+    }
+    .stButton > button:hover {
+        background-color: #1E90FF;
+        color: white;
+    }
+    </style>
+    """, 
+    unsafe_allow_html=True
 )
 
-# --- Check Login Status ---
-name, authentication_status, username = authenticator.login('Login', 'main')
+# Renders the fixed blue header bar with the title and a placeholder Logout link
+st.markdown('<div class="main-header">Forecasters\' Tools <a href="#" class="logout-link">Log Out</a></div>', unsafe_allow_html=True)
 
-# ------------------------------------------------
-# 3. RENDER APP CONTENT BASED ON LOGIN STATUS
-# ------------------------------------------------
+# Main Page Content (Below the Header)
+col_left, col_center, col_right = st.columns([1, 2, 1])
 
-if authentication_status:
-    # 3A. Inject Custom CSS for Header/Buttons and UI Hiding
-    st.markdown(
-        """
-        <style>
-        /* Hides the last remaining 'Share' button/widget */
-        .st-emotion-cache-1jm69yr { 
-            display: none !important;
-        }
+with col_center:
+    st.markdown("<h3 style='text-align: center; margin-top: 20px;'>Select a Tool from the Sidebar Menu on the Left</h3>", unsafe_allow_html=True)
+    st.markdown("---")
 
-        /* CUSTOM BLUE HEADER BAR */
-        .main-header {
-            background-color: #1E90FF;
-            color: white;
-            padding: 10px 0;
-            text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        /* Push main content down */
-        .st-emotion-cache-1g8i5u7, .st-emotion-cache-6qob1r, .st-emotion-cache-1y4pm5r {
-            padding-top: 80px; 
-        }
-        
-        /* Logout Link/Button Placement */
-        #logout-button {
-            position: absolute;
-            right: 20px;
-            top: 15px;
-        }
-
-        /* CUSTOM BUTTON STYLING */
-        div.stButton {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 5px; 
-        }
-        .stButton > button {
-            width: 250px;
-            height: 40px;
-            margin: 5px 0;
-            font-size: 16px;
-            border: 1px solid #1E90FF; 
-            color: #1E90FF;
-            background-color: white;
-        }
-        .stButton > button:hover {
-            background-color: #1E90FF;
-            color: white;
-        }
-        </style>
-        """, 
-        unsafe_allow_html=True
-    )
-
-    # 3B. RENDER APP CONTENT
-    st.markdown('<div class="main-header">Forecasters\' Tools</div>', unsafe_allow_html=True)
-    authenticator.logout('Log Out', 'fixed', key='logout-button')
-
-
-    # Main Page Content (Below the Header)
-    col_left, col_center, col_right = st.columns([1, 2, 1])
-
-    with col_center:
-        st.markdown(f"**Welcome, {name}!**", unsafe_allow_html=True)
-        st.markdown("---")
-        st.markdown("<h3 style='text-align: center; margin-top: 20px;'>Select a Tool from the Sidebar Menu on the Left</h3>", unsafe_allow_html=True)
-        st.markdown("---")
-
-        # ONLY THE REQUESTED BUTTONS
-        st.button("Rainfall Probablity")
-        st.button("Temperature Probability")
-        st.button("Forecast Graphic")
-        st.button("Satellite Image")
-        
-        st.markdown("---")
-        st.info("The map tools, 'Rainfall Outlook' and 'Temperature Outlook', are available in the sidebar menu.")
-
-# ------------------------------------------------
-# 4. HANDLE AUTHENTICATION FAILURES
-# ------------------------------------------------
-elif authentication_status is False:
-    st.error('Username/password is incorrect')
-
-elif authentication_status is None:
-    st.warning('Please enter your username and password')
+    # ONLY THE REQUESTED BUTTONS ARE HERE
+    st.button("Rainfall Probablity")
+    st.button("Temperature Probability")
+    st.button("Forecast Graphic")
+    st.button("Satellite Image")
+    
+    st.markdown("---")
+    # Info message guiding the user to the sidebar pages
+    st.info("The map tools, 'Rainfall Outlook' and 'Temperature Outlook', are available in the sidebar menu.")
