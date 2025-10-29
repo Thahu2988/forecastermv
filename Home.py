@@ -10,7 +10,7 @@ st.set_page_config(
     menu_items={'About': 'Developed by Maldives Meteorological Service (MMS)', 
                 'Get Help': None, 
                 'Report a bug': None},
-    # CRITICAL: Hides the GitHub Icon, Edit Icon, and Star Icon toolbar
+    # CRITICAL: Hides the GitHub Icon, Edit Icon, and Star Icon toolbar (the icons you pointed out)
     show_toolbar_by_default=False 
 )
 
@@ -35,7 +35,6 @@ st.markdown(
     }
     
     /* Push main content down to account for the fixed header */
-    /* Targeting specific container classes to push content down */
     .st-emotion-cache-1g8i5u7, .st-emotion-cache-6qob1r, .st-emotion-cache-1y4pm5r {
         padding-top: 80px; 
     }
@@ -75,7 +74,6 @@ st.markdown(
 st.markdown('<div class="main-header">Forecasters\' Tools <a href="#" class="logout-link">Log Out</a></div>', unsafe_allow_html=True)
 
 # Main Page Content (Below the Header)
-# Use columns to center the buttons
 col_left, col_center, col_right = st.columns([1, 2, 1])
 
 with col_center:
