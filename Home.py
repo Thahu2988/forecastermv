@@ -6,8 +6,8 @@ st.set_page_config(
     page_title="Forecasters' Tools",
     page_icon="🗺️",
     layout="wide",
-    # CRITICAL: Hides the hamburger menu (View App, Settings, About) 
-    menu_items={'About': 'Developed by Thahumeena from Maldives Meteorological Service (MMS)', 
+    # CRITICAL: Hides the hamburger menu (Settings/About) 
+    menu_items={'About': 'Developed by Maldives Meteorological Service (MMS)', 
                 'Get Help': None, 
                 'Report a bug': None},
     # CRITICAL: Hides the GitHub Icon, Edit Icon, and Star Icon toolbar
@@ -82,12 +82,12 @@ with col_center:
     st.markdown("<h3 style='text-align: center; margin-top: 20px;'>Select a Tool from the Sidebar Menu on the Left</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # Placeholder buttons matching the UI image
+    # ONLY THE REQUESTED BUTTONS ARE HERE
+    st.button("Rainfall Probablity")
+    st.button("Temperature Probability")
     st.button("Forecast Graphic")
     st.button("Satellite Image")
-    st.button("Weather News")
     
     st.markdown("---")
-    # This info message guides the user to the pages folder scripts
-    st.info("Your custom map tools are now available as **'Rainfall Outlook'** and **'Temperature Outlook'** in the Streamlit sidebar menu.")
-
+    # Info message guiding the user to the sidebar pages
+    st.info("The map tools, 'Rainfall Outlook' and 'Temperature Outlook', are available in the sidebar menu.")
