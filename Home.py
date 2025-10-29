@@ -6,11 +6,11 @@ st.set_page_config(
     page_title="Forecasters' Tools",
     page_icon="🗺️",
     layout="wide",
-    # CRITICAL: Hides the hamburger menu (Settings/About) 
+    # CRITICAL: Hides the hamburger menu (View App, Settings, About) 
     menu_items={'About': 'Developed by Maldives Meteorological Service (MMS)', 
                 'Get Help': None, 
                 'Report a bug': None},
-    # CRITICAL: Hides the GitHub Icon, Edit Icon, and Star Icon toolbar (the icons you pointed out)
+    # CRITICAL: Hides the GitHub Icon, Edit Icon, and Star Icon toolbar
     show_toolbar_by_default=False 
 )
 
@@ -35,6 +35,7 @@ st.markdown(
     }
     
     /* Push main content down to account for the fixed header */
+    /* Targeting specific container classes to push content down */
     .st-emotion-cache-1g8i5u7, .st-emotion-cache-6qob1r, .st-emotion-cache-1y4pm5r {
         padding-top: 80px; 
     }
@@ -74,18 +75,22 @@ st.markdown(
 st.markdown('<div class="main-header">Forecasters\' Tools <a href="#" class="logout-link">Log Out</a></div>', unsafe_allow_html=True)
 
 # Main Page Content (Below the Header)
+# Use columns to center the buttons
 col_left, col_center, col_right = st.columns([1, 2, 1])
 
 with col_center:
     st.markdown("<h3 style='text-align: center; margin-top: 20px;'>Select a Tool from the Sidebar Menu on the Left</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
-    # ONLY THE REQUESTED BUTTONS ARE HERE
-    st.button("Rainfall Probablity")
-    st.button("Temperature Probability")
+    # Placeholder buttons matching the UI image
+    st.button("Tide Chart")
+    st.button("Alert Graphic")
     st.button("Forecast Graphic")
+    st.button("Weekend Forecast")
     st.button("Satellite Image")
+    st.button("Forecast App (Testing)")
+    st.button("Weather News")
     
     st.markdown("---")
-    # Info message guiding the user to the sidebar pages
-    st.info("The map tools, 'Rainfall Outlook' and 'Temperature Outlook', are available in the sidebar menu.")
+    # This info message guides the user to the pages folder scripts
+    st.info("Your custom map tools are now available as **'Rainfall Outlook'** and **'Temperature Outlook'** in the Streamlit sidebar menu.")
