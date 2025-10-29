@@ -12,11 +12,9 @@ st.set_page_config(
     page_title="Forecasters' Tools",
     page_icon="🗺️",
     layout="wide",
-    # Hides the hamburger menu (Settings/About) 
     menu_items={'About': 'Developed by Maldives Meteorological Service (MMS)', 
                 'Get Help': None, 
                 'Report a bug': None},
-    # Hides the GitHub Icon, Edit Icon, and Star Icon toolbar
     show_toolbar_by_default=False 
 )
 
@@ -26,12 +24,10 @@ st.set_page_config(
 # ------------------------------------------------
 
 # ⚠️ WARNING: REPLACE THIS HASH WITH A REAL ONE GENERATED FOR YOUR PASSWORD
-# The password must be HASHED.
 hashed_passwords = ['$2b$12$ABCDEFGHIJKLMNO.PQRSTUVWXYZ.EXAMPLE.HASH.DO.NOT.USE'] 
 
 authenticator = stauth.Authenticate(
     names=['MMS Forecaster'],
-    # Use 'metmdv' as the username
     usernames=['metmdv'],
     passwords=hashed_passwords,
     cookie_name='forecaster_cookie',
@@ -109,9 +105,7 @@ if authentication_status:
     )
 
     # 3B. RENDER APP CONTENT
-    # Render the fixed blue header bar with the title and the Logout button
     st.markdown('<div class="main-header">Forecasters\' Tools</div>', unsafe_allow_html=True)
-    # The Logout button is rendered by the authenticator
     authenticator.logout('Log Out', 'fixed', key='logout-button')
 
 
