@@ -7,7 +7,7 @@ st.set_page_config(
     page_icon="🗺️",
     layout="wide",
     # CRITICAL: Hides the hamburger menu (View App, Settings, About) 
-    menu_items={'About': 'Developed by Maldives Meteorological Service (MMS)', 
+    menu_items={'About': 'Developed by Thahumeena from Maldives Meteorological Service (MMS)', 
                 'Get Help': None, 
                 'Report a bug': None},
     # CRITICAL: Hides the GitHub Icon, Edit Icon, and Star Icon toolbar
@@ -83,14 +83,11 @@ with col_center:
     st.markdown("---")
 
     # Placeholder buttons matching the UI image
-    st.button("Tide Chart")
-    st.button("Alert Graphic")
     st.button("Forecast Graphic")
-    st.button("Weekend Forecast")
     st.button("Satellite Image")
-    st.button("Forecast App (Testing)")
     st.button("Weather News")
     
     st.markdown("---")
     # This info message guides the user to the pages folder scripts
     st.info("Your custom map tools are now available as **'Rainfall Outlook'** and **'Temperature Outlook'** in the Streamlit sidebar menu.")
+
