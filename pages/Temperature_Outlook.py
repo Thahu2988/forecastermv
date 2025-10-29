@@ -1,3 +1,5 @@
+from config import app_setup
+app_setup("Forecasters' Tools")
 import streamlit as st
 import geopandas as gpd
 import matplotlib.pyplot as plt
@@ -143,4 +145,5 @@ if generate_map:
     st.success("✅ Map generated successfully!")
 else:
     st.info("👈 Adjust probabilities and categories for each atoll, edit map title, then click 'Generate Map'.")
+
 
