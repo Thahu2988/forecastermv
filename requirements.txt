@@ -1,11 +1,5 @@
 streamlit
-streamlit_authenticator
-pyyaml
-# Geospatial dependencies (CRITICAL for geopandas on cloud platforms)
-pandas
-numpy
-fiona
-pyproj
-shapely
-matplotlib
 geopandas
+matplotlib
+numpy
+shapely
