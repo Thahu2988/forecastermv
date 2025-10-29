@@ -7,11 +7,10 @@ st.set_page_config(
     page_icon="🗺️",
     layout="wide",
     # CRITICAL: Hides the hamburger menu (View App, Settings, About) 
+    # This prevents users from easily viewing app settings or source code.
     menu_items={'About': 'Developed by Maldives Meteorological Service (MMS)', 
                 'Get Help': None, 
-                'Report a bug': None},
-    # CRITICAL: Hides the GitHub Icon, Edit Icon, and Star Icon toolbar
-    show_toolbar_by_default=False 
+                'Report a bug': None} 
 )
 
 # 2. Inject Custom CSS for the Blue Header Bar and Button Styling
@@ -35,7 +34,6 @@ st.markdown(
     }
     
     /* Push main content down to account for the fixed header */
-    /* Targeting specific container classes to push content down */
     .st-emotion-cache-1g8i5u7, .st-emotion-cache-6qob1r, .st-emotion-cache-1y4pm5r {
         padding-top: 80px; 
     }
@@ -66,12 +64,13 @@ st.markdown(
         background-color: #1E90FF;
         color: white;
     }
+    /* Hiding the default hamburger menu and file viewer icon is handled by menu_items above */
     </style>
     """, 
     unsafe_allow_html=True
 )
 
-# Renders the fixed blue header bar with the title and a placeholder Logout link
+# Renders the fixed blue header bar with the title and a logout link
 st.markdown('<div class="main-header">Forecasters\' Tools <a href="#" class="logout-link">Log Out</a></div>', unsafe_allow_html=True)
 
 # Main Page Content (Below the Header)
