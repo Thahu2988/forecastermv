@@ -1,6 +1,7 @@
 streamlit
+streamlit_authenticator
+pyyaml  <-- ADD THIS LINE
 geopandas
 matplotlib
 numpy
 shapely
-streamlit_authenticator
