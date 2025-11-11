@@ -28,8 +28,14 @@ hide_streamlit_style = """
     /* Hide Default Elements (Menu, Footer, Header) */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    /* We keep header visible temporarily, the custom fixed header will be built below */
     
+    /* NEW FIX: Aggressive z-index to bring the sidebar toggle arrow to the front */
+    /* This targets the main content area's top-left to ensure the toggle is accessible */
+    [data-testid="stSidebar"] + div > div:nth-child(1) {
+        z-index: 999999 !important; /* Extremely high z-index */
+        position: relative; /* Must be relative or absolute for z-index to work */
+    }
+
     /* Target and hide the top-right icons (Share, Star, Pencil, etc.) */
     [data-testid="baseButton-header"] {visibility: hidden !important;} /* Hides the 'Share' button */
     [data-testid="stToolbar"] > button {visibility: hidden !important;} /* Hides the remaining icons */
@@ -40,7 +46,7 @@ hide_streamlit_style = """
     [data-testid="stStatusWidget"] {visibility: hidden !important;}
     div[data-testid="stActionButton"] {visibility: hidden !important;}
 
-    /* Custom App Styles */
+    /* Custom App Styles (Kept from last version) */
     .stApp > .main > div {
         padding-top: 84px; /* Adjust content padding for fixed header */
     }
@@ -104,11 +110,10 @@ hide_streamlit_style = """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # ---------------------------
-# 2. HEADER + STYLE (Now built with st.container() for fixed positioning)
+# 2. HEADER + STYLE (Removed the components.html part as it's now handled by CSS in Section 1)
 # ---------------------------
-# We need to build the header in section 6 after the login check, 
-# but the custom styling is here.
 # Removed HEADER_HTML and components.html(HEADER_HTML, height=10)
+
 
 # ---------------------------
 # 3. PAGE CONFIG ERROR HANDLER
@@ -162,41 +167,30 @@ if not st.session_state.logged_in:
     st.stop()
 
 # ---------------------------
-# 6. MAIN APP (After Login) - Custom Header implemented here
+# 6. MAIN APP (After Login) - Custom Header implementation here
 # ---------------------------
 
-# Use an empty container to position the fixed header on top
-header_container = st.empty()
-
 # Custom Fixed Header using a div and st.markdown for styling
-header_container.markdown(
+# This replaces the original components.html in section 2
+st.markdown(
     f"""
     <div class="custom-fixed-header">
         <span class="header-title">Forecasters' Tools</span>
         <div class="logout-button-container">
-            {st.button(f"Log Out ({st.session_state.username})", key="logout_btn_header")}
+            {st.button(f"Log Out ({st.session_state.username})", key="logout_btn_header_dummy")}
         </div>
     </div>
     """,
     unsafe_allow_html=True
 )
 
-# This is a workaround because st.button() doesn't execute inside st.markdown(). 
-# We detect the button click using JavaScript or, simpler, check the session state.
-# Since we replaced the st.button() with HTML for styling, 
-# we need to revert to the standard st.button() in a hidden area for functionality.
-
-# The button logic must be separate from the fixed HTML structure. 
-# Re-implementing the button outside the fixed div to maintain functionality:
-
-with st.container():
-    # Invisible columns to push the functional button far away (alternative to CSS hiding)
-    st.columns([1, 9, 1])[2].button(
-        f"Log Out ({st.session_state.username})", 
-        key="logout_btn_functional", 
-        on_click=do_logout
-    )
-    # Rerun the header if the functional button was clicked (this is handled by on_click=do_logout)
+# Functional Log Out button (hidden, but linked to the state change)
+# We place this off-screen so the one in the custom header looks functional.
+st.columns([1, 9, 1])[2].button(
+    f"Log Out ({st.session_state.username})", 
+    key="logout_btn_functional", 
+    on_click=do_logout
+)
 
 
 col_left, col_center, col_right = st.columns([1, 2, 1])
