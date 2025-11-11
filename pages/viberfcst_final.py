@@ -10,6 +10,7 @@ MAP_FILE_PATH = "pages/maldives_map.jpg"
 EMBLEM_FILE_PATH = "pages/emblem.png"
 
 # Font paths (assuming 'fonts' folder is inside 'pages')
+# Note: You confirmed 'Mvlhohi bold.ttf' works, so I kept the path as requested.
 FARUMA_FONT_PATH = "pages/fonts/Faruma.ttf"
 MVLHOHI_FONT_PATH = "pages/fonts/Mvlhohi bold.ttf"
 
@@ -53,18 +54,28 @@ st.set_page_config(
     layout="wide"
 )
 
-# 🚀 AGGRESSIVE TOP-SPACE REMOVAL: Uses negative margin to pull content up.
+# 🚀 AGGRESSIVE TOP-SPACE REMOVAL AND TOOLBAR HIDING
 st.markdown("""
     <style>
-    /* Targets the main content block container */
-    .block-container {
-        padding-top: 0rem; /* Remove default top padding */
-        margin-top: -50px; /* Pull the content aggressively up into the default header area */
-        max-width: 100%; /* Ensure wide layout is respected */
+    /* 1. HIDES THE THREE-DOT MENU AND OTHER TOOLBAR ICONS */
+    div[data-testid="stToolbar"] {
+        visibility: hidden !important;
+        height: 0px !important;
     }
-    /* Targets the inner block that contains the components to pull it up */
+    /* If you still want the top-left hamburger menu visible, you might use: */
+    /* div[data-testid="stToolbar"] > div:first-child {
+        visibility: visible !important;
+    } */
+
+    /* 2. Targets the main content block container to remove top padding */
+    .block-container {
+        padding-top: 0rem !important; /* Remove default top padding */
+        margin-top: -50px !important; /* Pull the content aggressively up into the default header area */
+        max-width: 100% !important; /* Ensure wide layout is respected */
+    }
+    /* 3. Targets the inner block that contains the components to pull it up */
     .css-1r6bpt { 
-        padding-top: 0; 
+        padding-top: 0 !important; 
     }
     </style>
 """, unsafe_allow_html=True)
