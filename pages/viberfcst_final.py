@@ -4,20 +4,18 @@ import base64
 import os
 
 # --- 0. FILE PATHS AND BASE64 CONVERSION ---
-# ⚠️ IMPORTANT: File paths are updated to assume all assets are in a 'pages' subdirectory,
-# relative to the script running the Streamlit app.
-MAP_FILE_PATH = "pages/maldives_map.jpg"
-EMBLEM_FILE_PATH = "pages/emblem.png"
+# ⚠️ IMPORTANT: Paths reverted to relative to the script's directory, as per file structure image.
+MAP_FILE_PATH = "maldives_map.jpg"
+EMBLEM_FILE_PATH = "emblem.png"
 
-# Font paths (assuming 'fonts' folder is inside 'pages')
-FARUMA_FONT_PATH = "pages/fonts/Faruma.ttf"
-MVLHOHI_FONT_PATH = "pages/fonts/Mvlhohi bold.ttf"
+# Font paths (assuming 'fonts' folder is in the same directory as the script)
+FARUMA_FONT_PATH = "fonts/Faruma.ttf"
+MVLHOHI_FONT_PATH = "fonts/Mvlhohi bold.ttf"
 
 
 def get_asset_base64_uri(path):
     """Converts a local file (image or font) to a Base64 Data URI."""
     if not os.path.exists(path):
-        # Using a default error image for demonstration, but you must supply the files.
         st.error(f"❌ Error: Required file not found at path: **{path}**")
         return None
     try:
@@ -27,7 +25,6 @@ def get_asset_base64_uri(path):
                 mime_type = 'image/png' 
             elif path.lower().endswith(('.jpg', '.jpeg')):
                 mime_type = 'image/jpeg'
-            # Check for font MIME types
             elif path.lower().endswith(('.ttf', '.otf', '.woff', '.woff2')):
                 mime_type = 'font/ttf' 
             else:
@@ -37,11 +34,9 @@ def get_asset_base64_uri(path):
         st.error(f"❌ Error reading or encoding file **{path}**: {e}")
         return None
 
-# Convert all image assets to Base64
+# Convert all assets to Base64
 MAP_IMAGE_DATA_URI = get_asset_base64_uri(MAP_FILE_PATH)
 EMBLEM_IMAGE_DATA_URI = get_asset_base64_uri(EMBLEM_FILE_PATH)
-
-# Convert all font assets to Base64 (needed for CSS @font-face rule inside HTML)
 FARUMA_FONT_DATA_URI = get_asset_base64_uri(FARUMA_FONT_PATH)
 MVLHOHI_FONT_DATA_URI = get_asset_base64_uri(MVLHOHI_FONT_PATH)
 
@@ -53,16 +48,25 @@ st.set_page_config(
     layout="wide"
 )
 
-# 🚀 AGGRESSIVE TOP-SPACE REMOVAL: Uses negative margin to pull content up.
+# 🚀 AGGRESSIVE TOP-SPACE REMOVAL & HIDING TOP-RIGHT ICONS
 st.markdown("""
     <style>
-    /* Targets the main content block container */
+    /* 1. Hides the "Share, Star, Edit, GitHub, and 3-dot Menu" in the top-right corner */
+    div[data-testid="stToolbar"] {
+        visibility: hidden;
+        height: 0px;
+    }
+    div[data-testid="stToolbar"] > div:first-child {
+        visibility: visible; /* Keeps the standard Streamlit hamburger menu if present */
+    }
+    
+    /* 2. Targets the main content block container */
     .block-container {
         padding-top: 0rem; /* Remove default top padding */
         margin-top: -50px; /* Pull the content aggressively up into the default header area */
         max-width: 100%; /* Ensure wide layout is respected */
     }
-    /* Targets the inner block that contains the components to pull it up */
+    /* 3. Targets the inner block that contains the components to pull it up */
     .css-1r6bpt { 
         padding-top: 0; 
     }
@@ -78,7 +82,6 @@ if any(uri is None for uri in [MAP_IMAGE_DATA_URI, EMBLEM_IMAGE_DATA_URI, FARUMA
 
 
 # Define the massive HTML/CSS/JS block using f-string and triple quotes
-# IMPORTANT: Updated the font URIs in the HTML @font-face rule.
 HTML_GENERATOR = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -106,7 +109,7 @@ HTML_GENERATOR = f"""
     }}
     
     /* ========================================
-    *** FONT DEFINITIONS (UPDATED WITH BASE64 URIs) ***
+    *** FONT DEFINITIONS (Using Base64 URIs) ***
     ======================================== */
     @font-face {{
         font-family: 'Faruma';
