@@ -1,25 +1,3 @@
-# Home.py
-# Note: Assuming 'config.py' with 'app_setup' exists or that line is commented/removed if not available
-# from config import app_setup
-# app_setup("Forecasters' Tools")
-import os
-import streamlit as st
-import streamlit.components.v1 as components
-
-# ---------------------------
-# 0. PAGE CONFIG (safe wrapper)
-# ---------------------------
-try:
-    st.set_page_config(
-        page_title="Forecasters' Tools",
-        page_icon="🗺️",
-        layout="wide"
-    )
-    _page_config_ok = True
-except Exception as e:
-    _page_config_error = str(e)
-    _page_config_ok = False
-
 # ---------------------------
 # 1. HIDE STREAMLIT UI (Revised to ensure sidebar toggle is visible)
 # ---------------------------
@@ -29,22 +7,36 @@ hide_streamlit_style = """
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     
-    /* NEW FIX: Aggressive z-index on the sidebar itself to ensure its toggle is visible over the custom header (z-index: 1000) */
+    /* FIX: Aggressively elevate the Sidebar and its toggle container */
+    
+    /* 1. Ensure the sidebar itself is highly elevated */
     [data-testid="stSidebar"] {
         z-index: 999999 !important; 
     }
     
-    /* Hide only the Share button, as requested earlier */
+    /* 2. Elevate the container that holds the toggle icon */
+    [data-testid="stDecoration"] {
+        z-index: 999999 !important;
+        visibility: visible !important; /* Ensure it's not accidentally hidden */
+        /* Also target the default streamlit header which often contains the toggle */
+        background-color: transparent !important;
+        height: 0 !important;
+    }
+    
+    /* 3. Lower the main content container relative to the custom fixed header (z-index: 1000), 
+          forcing the sidebar toggle (which is outside of the main content) to appear on top. */
+    .stApp > header {
+        z-index: 999 !important; 
+    }
+
+    /* Hide only the Share button, and skip hiding other toolbar icons */
     [data-testid="baseButton-header"] {visibility: hidden !important;}
 
-    /* Removed rules targeting stToolbar and other developer menus to prevent hiding the toggle arrow */
-
     /* Ensure other non-essential hidden elements are still targeted */
-    [data-testid="stDecoration"] {visibility: hidden !important;}
     [data-testid="stStatusWidget"] {visibility: hidden !important;}
     div[data-testid="stActionButton"] {visibility: hidden !important;}
 
-    /* Custom App Styles (Kept from last version) */
+    /* Custom App Styles (Keep z-index at 1000 for the fixed header) */
     .stApp > .main > div {
         padding-top: 84px; /* Adjust content padding for fixed header */
     }
@@ -70,7 +62,6 @@ hide_streamlit_style = """
         display: flex;
         align-items: center;
     }
-    /* Style for the Log Out button within the header */
     .logout-button-container button {
         background-color: white !important;
         color: #1E90FF !important;
@@ -106,94 +97,3 @@ hide_streamlit_style = """
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
-
-# ---------------------------
-# 2. HEADER + STYLE (Removed the components.html part as it's now handled by CSS in Section 1)
-# ---------------------------
-# Removed HEADER_HTML and components.html(HEADER_HTML, height=10)
-
-
-# ---------------------------
-# 3. PAGE CONFIG ERROR HANDLER
-# ---------------------------
-if not _page_config_ok:
-    st.warning(
-        "⚠️ Page configuration failed. Check 'Manage app → Logs' for details."
-    )
-    st.caption(f"Error detail: {_page_config_error}")
-
-# ---------------------------
-# 4. LOGIN SYSTEM
-# ---------------------------
-# HARDCODED CREDENTIALS - REMINDER: Move these to st.secrets for security!
-USER_CREDENTIALS = {"forecaster": "Maldives123"} 
-
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "username" not in st.session_state:
-    st.session_state.username = ""
-
-def do_login(username, password):
-    username = (username or "").strip()
-    if username in USER_CREDENTIALS and USER_CREDENTIALS[username] == password:
-        st.session_state.logged_in = True
-        st.session_state.username = username
-        st.rerun()
-    else:
-        st.error("Invalid username or password")
-
-def do_logout():
-    st.session_state.logged_in = False
-    st.session_state.username = ""
-    st.rerun()
-
-# ---------------------------
-# 5. LOGIN PAGE
-# ---------------------------
-if not st.session_state.logged_in:
-    st.markdown("<div style='height:40px'></div>", unsafe_allow_html=True)
-    st.markdown("<h2 style='text-align:center;'>Forecasters' Tools — Sign In</h2>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align:center; margin-top:-10px;'>Please sign in to access MMS tools.</p>", unsafe_allow_html=True)
-
-    with st.form("login_form"):
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        submitted = st.form_submit_button("Sign In")
-        if submitted:
-            do_login(username, password)
-
-    st.stop()
-
-# ---------------------------
-# 6. MAIN APP (After Login) - Custom Header implementation here
-# ---------------------------
-
-# Custom Fixed Header using a div and st.markdown for styling
-st.markdown(
-    f"""
-    <div class="custom-fixed-header">
-        <span class="header-title">Forecasters' Tools</span>
-        <div class="logout-button-container">
-            {st.button(f"Log Out ({st.session_state.username})", key="logout_btn_header_dummy")}
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
-
-# Functional Log Out button (hidden, but linked to the state change)
-# We place this off-screen so the one in the custom header looks functional.
-st.columns([1, 9, 1])[2].button(
-    f"Log Out ({st.session_state.username})", 
-    key="logout_btn_functional", 
-    on_click=do_logout
-)
-
-
-col_left, col_center, col_right = st.columns([1, 2, 1])
-
-with col_center:
-    st.markdown("<h3 style='text-align: center; margin-top: 8px;'>Select a Tool from the Sidebar Menu on the Left</h3>", unsafe_allow_html=True)
-    st.markdown("---")
-
-    st.info("Your custom map tools are available as **'Rainfall Outlook'** and **'Temperature Outlook'** in the sidebar.")
