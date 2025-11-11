@@ -29,7 +29,10 @@ hide_streamlit_style = """
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    [data-testid="stToolbar"] {visibility: hidden !important;}
+    /* **FIX APPLIED HERE:** The line below was hiding the top-left sidebar arrow. 
+    It is now commented out to allow users to toggle the sidebar menu.
+    */
+    /* [data-testid="stToolbar"] {visibility: hidden !important;} */
     [data-testid="stDecoration"] {visibility: hidden !important;}
     [data-testid="stStatusWidget"] {visibility: hidden !important;}
     div[data-testid="stActionButton"] {visibility: hidden !important;}
@@ -90,8 +93,8 @@ div.stButton {
 </style>
 
 <div class="main-header" id="mainHeader">
-  Forecasters' Tools
-  <span class="logout-link" id="logoutAnchor"></span>
+    Forecasters' Tools
+    <span class="logout-link" id="logoutAnchor"></span>
 </div>
 """
 components.html(HEADER_HTML, height=10)
