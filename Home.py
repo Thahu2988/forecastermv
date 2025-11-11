@@ -1,6 +1,7 @@
 # Home.py
-from config import app_setup
-app_setup("Forecasters' Tools")
+# Note: Assuming 'config.py' with 'app_setup' exists or that line is commented/removed if not available
+# from config import app_setup
+# app_setup("Forecasters' Tools")
 import os
 import streamlit as st
 import streamlit.components.v1 as components
@@ -16,8 +17,8 @@ try:
     )
     _page_config_ok = True
 except Exception as e:
-    _page_config_ok = False
     _page_config_error = str(e)
+    _page_config_ok = False
 
 # ---------------------------
 # 1. HIDE STREAMLIT UI (Toolbar, Menu, Footer)
@@ -107,7 +108,8 @@ if not _page_config_ok:
 # ---------------------------
 # 4. LOGIN SYSTEM
 # ---------------------------
-USER_CREDENTIALS = {"forecaster": "mms123"}  # Replace later with secure backend
+# HARDCODED CREDENTIALS - REMINDER: Move these to st.secrets for security!
+USER_CREDENTIALS = {"forecaster": "Maldives123"} 
 
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -116,24 +118,27 @@ if "username" not in st.session_state:
 
 def do_login(username, password):
     username = (username or "").strip()
+    # Check against hardcoded credentials
     if username in USER_CREDENTIALS and USER_CREDENTIALS[username] == password:
         st.session_state.logged_in = True
         st.session_state.username = username
-        st.experimental_rerun()
+        # FIX: Using st.rerun()
+        st.rerun()
     else:
         st.error("Invalid username or password")
 
 def do_logout():
     st.session_state.logged_in = False
     st.session_state.username = ""
-    st.experimental_rerun()
+    # FIX: Using st.rerun()
+    st.rerun()
 
 # ---------------------------
 # 5. LOGIN PAGE
 # ---------------------------
 if not st.session_state.logged_in:
     st.markdown("<div style='height:40px'></div>", unsafe_allow_html=True)
-    st.markdown("<h2 style='text-align:center;'>🔒 Forecasters' Tools — Sign In</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align:center;'>Forecasters' Tools — Sign In</h2>", unsafe_allow_html=True)
     st.markdown("<p style='text-align:center; margin-top:-10px;'>Please sign in to access MMS tools.</p>", unsafe_allow_html=True)
 
     with st.form("login_form"):
@@ -143,7 +148,7 @@ if not st.session_state.logged_in:
         if submitted:
             do_login(username, password)
 
-    st.info("Demo credentials — Username: `forecaster`  Password: `mms123`")
+    # REMOVED: st.info("Demo credentials — Username: `forecaster`  Password: `Maldives123`")
     st.stop()
 
 # ---------------------------
@@ -160,23 +165,4 @@ with col_center:
     st.markdown("<h3 style='text-align: center; margin-top: 8px;'>Select a Tool from the Sidebar Menu on the Left</h3>", unsafe_allow_html=True)
     st.markdown("---")
 
-    if st.button("Tide Chart"):
-        st.info("Tide Chart clicked — wire this to a page or callback.")
-    if st.button("Alert Graphic"):
-        st.info("Alert Graphic clicked — wire this to a page or callback.")
-    if st.button("Forecast Graphic"):
-        st.info("Forecast Graphic clicked — wire this to a page or callback.")
-    if st.button("Weekend Forecast"):
-        st.info("Weekend Forecast clicked — wire this to a page or callback.")
-    if st.button("Satellite Image"):
-        st.info("Satellite Image clicked — wire this to a page or callback.")
-    if st.button("Forecast App (Testing)"):
-        st.info("Forecast App (Testing) clicked — wire this to a page or callback.")
-    if st.button("Weather News"):
-        st.info("Weather News clicked — wire this to a page or callback.")
-
-    st.markdown("---")
     st.info("Your custom map tools are available as **'Rainfall Outlook'** and **'Temperature Outlook'** in the sidebar.")
-
-st.markdown("<br><center><a href='#' style='color:#1E90FF;' onclick='window.location.reload();'>🔓 Log Out</a></center>", unsafe_allow_html=True)
-
