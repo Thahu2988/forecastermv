@@ -4,20 +4,23 @@ import base64
 import os
 
 # --- 0. FILE PATHS AND BASE64 CONVERSION ---
-# ⚠️ IMPORTANT: Paths reverted to relative to the script's directory, as per file structure image.
+# ⚠️ IMPORTANT: These paths must EXACTLY match the names of the files in your directory.
+# Based on common conventions, Mvlhohi-bold.ttf is often used instead of Mvlhohi bold.ttf.
+# If this still errors, please revert to the file names you see in your 'fonts' folder.
 MAP_FILE_PATH = "maldives_map.jpg"
 EMBLEM_FILE_PATH = "emblem.png"
 
-# Font paths (assuming 'fonts' folder is in the same directory as the script)
-FARUMA_FONT_PATH = "fonts/Faruma.ttf"
-MVLHOHI_FONT_PATH = "fonts/Mvlhohi bold.ttf"
+# Font paths (Assuming 'fonts' folder is in the same directory as the script)
+FARUMA_FONT_PATH = "fonts/Faruma.ttf" 
+MVLHOHI_FONT_PATH = "fonts/Mvlhohi-bold.ttf" # CHECK THIS: Changed space to hyphen as a common fix
 
 
 def get_asset_base64_uri(path):
     """Converts a local file (image or font) to a Base64 Data URI."""
     if not os.path.exists(path):
         st.error(f"❌ Error: Required file not found at path: **{path}**")
-        return None
+        # Returning a placeholder to allow the rest of the app to load for easier debugging
+        return "" 
     try:
         with open(path, "rb") as file:
             encoded_string = base64.b64encode(file.read()).decode()
@@ -32,7 +35,7 @@ def get_asset_base64_uri(path):
             return f"data:{mime_type};base64,{encoded_string}"
     except Exception as e:
         st.error(f"❌ Error reading or encoding file **{path}**: {e}")
-        return None
+        return ""
 
 # Convert all assets to Base64
 MAP_IMAGE_DATA_URI = get_asset_base64_uri(MAP_FILE_PATH)
@@ -48,7 +51,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 🚀 AGGRESSIVE TOP-SPACE REMOVAL & HIDING TOP-RIGHT ICONS
+# 🚀 CSS to Remove Top Space and HIDE TOP-RIGHT ICONS
 st.markdown("""
     <style>
     /* 1. Hides the "Share, Star, Edit, GitHub, and 3-dot Menu" in the top-right corner */
@@ -57,10 +60,10 @@ st.markdown("""
         height: 0px;
     }
     div[data-testid="stToolbar"] > div:first-child {
-        visibility: visible; /* Keeps the standard Streamlit hamburger menu if present */
+        visibility: visible; /* Optionally keep Streamlit's default hamburger menu */
     }
     
-    /* 2. Targets the main content block container */
+    /* 2. Targets the main content block container to remove top padding */
     .block-container {
         padding-top: 0rem; /* Remove default top padding */
         margin-top: -50px; /* Pull the content aggressively up into the default header area */
@@ -76,10 +79,9 @@ st.markdown("""
 
 # --- 2. EMBEDDED HTML/CSS/JS GENERATOR ---
 
-if any(uri is None for uri in [MAP_IMAGE_DATA_URI, EMBLEM_IMAGE_DATA_URI, FARUMA_FONT_DATA_URI, MVLHOHI_FONT_DATA_URI]):
-    st.warning("Please resolve the file path errors for the images/fonts listed above before running the tool.")
-    st.stop()
-
+if not all([MAP_IMAGE_DATA_URI, EMBLEM_IMAGE_DATA_URI, FARUMA_FONT_DATA_URI, MVLHOHI_FONT_DATA_URI]):
+    st.warning("⚠️ Some required assets could not be loaded. Check file names and paths in Section 0 of the script. The app may not display correctly.")
+    # We still proceed to display the components.html below so the user can debug the layout.
 
 # Define the massive HTML/CSS/JS block using f-string and triple quotes
 HTML_GENERATOR = f"""
@@ -93,10 +95,6 @@ HTML_GENERATOR = f"""
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <style>
-    /* Add CSS variables for flexible control */
-    :root {{
-    }}
-
     /* --- Base layout and fonts --- */
     body {{
         font-family: Arial, sans-serif;
@@ -147,9 +145,9 @@ HTML_GENERATOR = f"""
     
     /* Advisory Textareas (Auto-resizing) */
     .advisory-textarea {{ 
-        min-height: 25px; /* Ensures minimum one-line height */
+        min-height: 25px; 
         height: auto; 
-        overflow-y: hidden; /* Hides scrollbar */
+        overflow-y: hidden; 
         resize: none; 
     }}
 
@@ -205,17 +203,17 @@ HTML_GENERATOR = f"""
     /* --- Advisory section (Base style) --- */
     .advisory-section {{
         background-color: #fffde7; 
-        border-radius: 8px; /* Added: Slightly more rounded */
+        border-radius: 8px; 
         margin: 5px 0 5px 0; 
-        padding: 5px 15px; /* Adjusted padding: 5px top/bottom, 15px left/right */
+        padding: 5px 15px; 
         display: none; 
         overflow: hidden; 
     }}
     
     /* --- Advisory Red Styling (From user request) --- */
     .red-advisory-style {{
-        background-color: #b30000; /* Darker, solid red background */
-        border: none; /* Removed the border to make it a solid block */
+        background-color: #b30000; 
+        border: none; 
     }}
     
     .red-advisory-style .advisory-dv p, 
@@ -223,12 +221,12 @@ HTML_GENERATOR = f"""
     .red-advisory-style .advisory-en p, 
     .red-advisory-style .advisory-en span {{
         color: white !important; 
-        font-weight: bold; /* Added: Makes the text bold */
+        font-weight: bold; 
     }}
     
     .advisory-en p, .advisory-dv p {{
         font-size: 0.95em;
-        margin: 0; /* Ensures no extra vertical space around text */
+        margin: 0; 
         line-height: 1.4em;
         display: block; 
         width: 100%;
@@ -336,7 +334,7 @@ HTML_GENERATOR = f"""
     <div class="datetime-group">
         <div class="input-item">
             <label for="date-input">Date</label>
-            <input type="date" id="date-input" value="2025-11-10" onchange="updatePost()">
+            <input type="date" id="date-input" value="2025-11-11" onchange="updatePost()">
         </div>
         <div class="input-item">
             <label for="time-select">Valid Until Time (hrs)</label>
@@ -672,6 +670,7 @@ HTML_GENERATOR = f"""
     function initializeEditor() {{
         populateTimeSelect();
         
+        // Use current date for initialization
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
