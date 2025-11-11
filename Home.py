@@ -1,3 +1,5 @@
+import streamlit as st # <-- ADD THIS LINE
+
 # ---------------------------
 # 1. HIDE STREAMLIT UI (Revised to ensure sidebar toggle is visible)
 # ---------------------------
@@ -24,7 +26,7 @@ hide_streamlit_style = """
     }
     
     /* 3. Lower the main content container relative to the custom fixed header (z-index: 1000), 
-          forcing the sidebar toggle (which is outside of the main content) to appear on top. */
+           forcing the sidebar toggle (which is outside of the main content) to appear on top. */
     .stApp > header {
         z-index: 999 !important; 
     }
