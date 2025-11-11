@@ -21,18 +21,23 @@ except Exception as e:
     _page_config_ok = False
 
 # ---------------------------
-# 1. HIDE STREAMLIT UI (Toolbar, Menu, Footer)
+# 1. HIDE STREAMLIT UI (Toolbar, Menu, Footer, and Header Icons)
 # ---------------------------
 hide_streamlit_style = """
     <style>
-    /* Hide Streamlit default UI elements */
+    /* Hide Default Elements (Menu, Footer, Header) */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    /* **FIX APPLIED HERE:** The line below was hiding the top-left sidebar arrow. 
-    It is now commented out to allow users to toggle the sidebar menu.
-    */
-    /* [data-testid="stToolbar"] {visibility: hidden !important;} */
+
+    /* **FIX 1:** Target and hide the top-right icons (Share, Star, Pencil, etc.) */
+    [data-testid="baseButton-header"] {visibility: hidden !important;} /* Hides the 'Share' button */
+    [data-testid="stToolbar"] > button {visibility: hidden !important;} /* Hides the remaining icons */
+    [data-testid="stSidebarContent"] button[title="View source on GitHub"] {visibility: hidden !important;}
+
+    /* **FIX 2:** The original line that hid the sidebar arrow is still commented out: 
+       /* [data-testid="stToolbar"] {visibility: hidden !important;} */
+
     [data-testid="stDecoration"] {visibility: hidden !important;}
     [data-testid="stStatusWidget"] {visibility: hidden !important;}
     div[data-testid="stActionButton"] {visibility: hidden !important;}
@@ -125,7 +130,6 @@ def do_login(username, password):
     if username in USER_CREDENTIALS and USER_CREDENTIALS[username] == password:
         st.session_state.logged_in = True
         st.session_state.username = username
-        # FIX: Using st.rerun()
         st.rerun()
     else:
         st.error("Invalid username or password")
@@ -133,7 +137,6 @@ def do_login(username, password):
 def do_logout():
     st.session_state.logged_in = False
     st.session_state.username = ""
-    # FIX: Using st.rerun()
     st.rerun()
 
 # ---------------------------
@@ -151,7 +154,6 @@ if not st.session_state.logged_in:
         if submitted:
             do_login(username, password)
 
-    # REMOVED: st.info("Demo credentials — Username: `forecaster`  Password: `Maldives123`")
     st.stop()
 
 # ---------------------------
