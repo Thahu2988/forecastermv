@@ -4,15 +4,14 @@ import base64
 import os
 
 # --- 0. FILE PATHS AND BASE64 CONVERSION ---
-# ⚠️ IMPORTANT: Ensure these files exist in the same directory as this script,
-# or adjust the paths accordingly.
-MAP_FILE_PATH = "maldives_map.jpg"
-EMBLEM_FILE_PATH = "emblem.png"
+# ⚠️ IMPORTANT: File paths are updated to assume all assets are in a 'pages' subdirectory,
+# relative to the script running the Streamlit app.
+MAP_FILE_PATH = "pages/maldives_map.jpg"
+EMBLEM_FILE_PATH = "pages/emblem.png"
 
-# Font paths (assuming they exist in the specified subfolder 'static/fonts/')
-# Ensure these files are present to avoid errors.
-FARUMA_FONT = "static/fonts/Faruma.ttf"
-MVLHOHI_FONT = "static/fonts/Mvlhohi bold.ttf"
+# Font paths (assuming 'fonts' folder is inside 'pages')
+FARUMA_FONT_PATH = "pages/fonts/Faruma.ttf"
+MVLHOHI_FONT_PATH = "pages/fonts/Mvlhohi bold.ttf"
 
 
 def get_asset_base64_uri(path):
@@ -28,6 +27,7 @@ def get_asset_base64_uri(path):
                 mime_type = 'image/png' 
             elif path.lower().endswith(('.jpg', '.jpeg')):
                 mime_type = 'image/jpeg'
+            # Check for font MIME types
             elif path.lower().endswith(('.ttf', '.otf', '.woff', '.woff2')):
                 mime_type = 'font/ttf' 
             else:
@@ -40,6 +40,10 @@ def get_asset_base64_uri(path):
 # Convert all image assets to Base64
 MAP_IMAGE_DATA_URI = get_asset_base64_uri(MAP_FILE_PATH)
 EMBLEM_IMAGE_DATA_URI = get_asset_base64_uri(EMBLEM_FILE_PATH)
+
+# Convert all font assets to Base64 (needed for CSS @font-face rule inside HTML)
+FARUMA_FONT_DATA_URI = get_asset_base64_uri(FARUMA_FONT_PATH)
+MVLHOHI_FONT_DATA_URI = get_asset_base64_uri(MVLHOHI_FONT_PATH)
 
 
 # --- 1. PAGE CONFIG and STYLING ---
@@ -68,12 +72,13 @@ st.markdown("""
 
 # --- 2. EMBEDDED HTML/CSS/JS GENERATOR ---
 
-if any(uri is None for uri in [MAP_IMAGE_DATA_URI, EMBLEM_IMAGE_DATA_URI]):
-    st.warning("Please resolve the file path errors for the images listed above before running the tool.")
+if any(uri is None for uri in [MAP_IMAGE_DATA_URI, EMBLEM_IMAGE_DATA_URI, FARUMA_FONT_DATA_URI, MVLHOHI_FONT_DATA_URI]):
+    st.warning("Please resolve the file path errors for the images/fonts listed above before running the tool.")
     st.stop()
 
 
 # Define the massive HTML/CSS/JS block using f-string and triple quotes
+# IMPORTANT: Updated the font URIs in the HTML @font-face rule.
 HTML_GENERATOR = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -101,16 +106,16 @@ HTML_GENERATOR = f"""
     }}
     
     /* ========================================
-    *** FONT DEFINITIONS ***
+    *** FONT DEFINITIONS (UPDATED WITH BASE64 URIs) ***
     ======================================== */
     @font-face {{
         font-family: 'Faruma';
-        src: url('{FARUMA_FONT}') format('truetype');
+        src: url('{FARUMA_FONT_DATA_URI}') format('truetype');
         font-weight: normal;
     }}
     @font-face {{
         font-family: 'Mvlhohi-Bold';
-        src: url('{MVLHOHI_FONT}') format('truetype');
+        src: url('{MVLHOHI_FONT_DATA_URI}') format('truetype');
         font-weight: bold;
     }}
 
