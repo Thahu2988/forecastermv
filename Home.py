@@ -28,81 +28,87 @@ hide_streamlit_style = """
     /* Hide Default Elements (Menu, Footer, Header) */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
-
-    /* **FIX 1:** Target and hide the top-right icons (Share, Star, Pencil, etc.) */
+    /* We keep header visible temporarily, the custom fixed header will be built below */
+    
+    /* Target and hide the top-right icons (Share, Star, Pencil, etc.) */
     [data-testid="baseButton-header"] {visibility: hidden !important;} /* Hides the 'Share' button */
     [data-testid="stToolbar"] > button {visibility: hidden !important;} /* Hides the remaining icons */
     [data-testid="stSidebarContent"] button[title="View source on GitHub"] {visibility: hidden !important;}
 
-    /* **FIX 2:** The original line that hid the sidebar arrow is still commented out: 
-       /* [data-testid="stToolbar"] {visibility: hidden !important;} */
-
+    /* Ensure other non-essential hidden elements are still targeted */
     [data-testid="stDecoration"] {visibility: hidden !important;}
     [data-testid="stStatusWidget"] {visibility: hidden !important;}
     div[data-testid="stActionButton"] {visibility: hidden !important;}
+
+    /* Custom App Styles */
+    .stApp > .main > div {
+        padding-top: 84px; /* Adjust content padding for fixed header */
+    }
+    .custom-fixed-header {
+        background-color: #1E90FF;
+        color: white;
+        padding: 10px 20px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1000;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .header-title {
+        font-size: 28px;
+        font-weight: bold;
+    }
+    .logout-button-container {
+        display: flex;
+        align-items: center;
+    }
+    /* Style for the Log Out button within the header */
+    .logout-button-container button {
+        background-color: white !important;
+        color: #1E90FF !important;
+        border: 1px solid white !important;
+        padding: 4px 12px !important;
+        height: auto !important;
+        font-size: 14px !important;
+        margin: 0 !important;
+        line-height: 1.5 !important;
+    }
+    .logout-button-container button:hover {
+        background-color: #f0f0f0 !important;
+    }
+    div.stButton {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 6px;
+    }
+    .stButton > button {
+        width: 250px;
+        height: 40px;
+        margin: 5px 0;
+        font-size: 16px;
+        border: 1px solid #1E90FF;
+        color: #1E90FF;
+        background-color: white;
+        border-radius: 6px;
+    }
+    .stButton > button:hover {
+        background-color: #1E90FF;
+        color: white;
+    }
     </style>
 """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 # ---------------------------
-# 2. HEADER + STYLE
+# 2. HEADER + STYLE (Now built with st.container() for fixed positioning)
 # ---------------------------
-HEADER_HTML = """
-<style>
-.main-header {
-    background-color: #1E90FF;
-    color: white;
-    padding: 10px 0;
-    text-align: center;
-    font-size: 28px;
-    font-weight: bold;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-}
-.logout-link {
-    position: absolute;
-    right: 20px;
-    top: 12px;
-    font-size: 14px;
-    color: white;
-    text-decoration: none;
-}
-.logout-link:hover { text-decoration: underline; }
-.stApp > .main > div {
-    padding-top: 84px;
-}
-div.stButton {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 6px;
-}
-.stButton > button {
-    width: 250px;
-    height: 40px;
-    margin: 5px 0;
-    font-size: 16px;
-    border: 1px solid #1E90FF;
-    color: #1E90FF;
-    background-color: white;
-    border-radius: 6px;
-}
-.stButton > button:hover {
-    background-color: #1E90FF;
-    color: white;
-}
-</style>
-
-<div class="main-header" id="mainHeader">
-    Forecasters' Tools
-    <span class="logout-link" id="logoutAnchor"></span>
-</div>
-"""
-components.html(HEADER_HTML, height=10)
+# We need to build the header in section 6 after the login check, 
+# but the custom styling is here.
+# Removed HEADER_HTML and components.html(HEADER_HTML, height=10)
 
 # ---------------------------
 # 3. PAGE CONFIG ERROR HANDLER
@@ -126,7 +132,6 @@ if "username" not in st.session_state:
 
 def do_login(username, password):
     username = (username or "").strip()
-    # Check against hardcoded credentials
     if username in USER_CREDENTIALS and USER_CREDENTIALS[username] == password:
         st.session_state.logged_in = True
         st.session_state.username = username
@@ -157,12 +162,42 @@ if not st.session_state.logged_in:
     st.stop()
 
 # ---------------------------
-# 6. MAIN APP (After Login)
+# 6. MAIN APP (After Login) - Custom Header implemented here
 # ---------------------------
-header_cols = st.columns([1, 9, 1])
-with header_cols[2]:
-    if st.button(f"Log Out ({st.session_state.username})"):
-        do_logout()
+
+# Use an empty container to position the fixed header on top
+header_container = st.empty()
+
+# Custom Fixed Header using a div and st.markdown for styling
+header_container.markdown(
+    f"""
+    <div class="custom-fixed-header">
+        <span class="header-title">Forecasters' Tools</span>
+        <div class="logout-button-container">
+            {st.button(f"Log Out ({st.session_state.username})", key="logout_btn_header")}
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# This is a workaround because st.button() doesn't execute inside st.markdown(). 
+# We detect the button click using JavaScript or, simpler, check the session state.
+# Since we replaced the st.button() with HTML for styling, 
+# we need to revert to the standard st.button() in a hidden area for functionality.
+
+# The button logic must be separate from the fixed HTML structure. 
+# Re-implementing the button outside the fixed div to maintain functionality:
+
+with st.container():
+    # Invisible columns to push the functional button far away (alternative to CSS hiding)
+    st.columns([1, 9, 1])[2].button(
+        f"Log Out ({st.session_state.username})", 
+        key="logout_btn_functional", 
+        on_click=do_logout
+    )
+    # Rerun the header if the functional button was clicked (this is handled by on_click=do_logout)
+
 
 col_left, col_center, col_right = st.columns([1, 2, 1])
 
