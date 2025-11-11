@@ -21,7 +21,7 @@ except Exception as e:
     _page_config_ok = False
 
 # ---------------------------
-# 1. HIDE STREAMLIT UI (Toolbar, Menu, Footer, and Header Icons)
+# 1. HIDE STREAMLIT UI (Revised to ensure sidebar toggle is visible)
 # ---------------------------
 hide_streamlit_style = """
     <style>
@@ -29,17 +29,15 @@ hide_streamlit_style = """
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     
-    /* NEW FIX: Aggressive z-index to bring the sidebar toggle arrow to the front */
-    /* This targets the main content area's top-left to ensure the toggle is accessible */
-    [data-testid="stSidebar"] + div > div:nth-child(1) {
-        z-index: 999999 !important; /* Extremely high z-index */
-        position: relative; /* Must be relative or absolute for z-index to work */
+    /* NEW FIX: Aggressive z-index on the sidebar itself to ensure its toggle is visible over the custom header (z-index: 1000) */
+    [data-testid="stSidebar"] {
+        z-index: 999999 !important; 
     }
+    
+    /* Hide only the Share button, as requested earlier */
+    [data-testid="baseButton-header"] {visibility: hidden !important;}
 
-    /* Target and hide the top-right icons (Share, Star, Pencil, etc.) */
-    [data-testid="baseButton-header"] {visibility: hidden !important;} /* Hides the 'Share' button */
-    [data-testid="stToolbar"] > button {visibility: hidden !important;} /* Hides the remaining icons */
-    [data-testid="stSidebarContent"] button[title="View source on GitHub"] {visibility: hidden !important;}
+    /* Removed rules targeting stToolbar and other developer menus to prevent hiding the toggle arrow */
 
     /* Ensure other non-essential hidden elements are still targeted */
     [data-testid="stDecoration"] {visibility: hidden !important;}
@@ -58,7 +56,7 @@ hide_streamlit_style = """
         top: 0;
         left: 0;
         width: 100%;
-        z-index: 1000;
+        z-index: 1000; /* Custom Header z-index */
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
         display: flex;
         align-items: center;
@@ -171,7 +169,6 @@ if not st.session_state.logged_in:
 # ---------------------------
 
 # Custom Fixed Header using a div and st.markdown for styling
-# This replaces the original components.html in section 2
 st.markdown(
     f"""
     <div class="custom-fixed-header">
