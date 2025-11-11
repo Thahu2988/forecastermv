@@ -4,23 +4,22 @@ import base64
 import os
 
 # --- 0. FILE PATHS AND BASE64 CONVERSION ---
-# ⚠️ IMPORTANT: These paths must EXACTLY match the names of the files in your directory.
-# Based on common conventions, Mvlhohi-bold.ttf is often used instead of Mvlhohi bold.ttf.
-# If this still errors, please revert to the file names you see in your 'fonts' folder.
-MAP_FILE_PATH = "maldives_map.jpg"
-EMBLEM_FILE_PATH = "emblem.png"
+# ⚠️ IMPORTANT: File paths are updated to assume all assets are in a 'pages' subdirectory,
+# relative to the script running the Streamlit app.
+MAP_FILE_PATH = "pages/maldives_map.jpg"
+EMBLEM_FILE_PATH = "pages/emblem.png"
 
-# Font paths (Assuming 'fonts' folder is in the same directory as the script)
-FARUMA_FONT_PATH = "fonts/Faruma.ttf" 
-MVLHOHI_FONT_PATH = "fonts/Mvlhohi-bold.ttf" # CHECK THIS: Changed space to hyphen as a common fix
+# Font paths (assuming 'fonts' folder is inside 'pages')
+FARUMA_FONT_PATH = "pages/fonts/Faruma.ttf"
+MVLHOHI_FONT_PATH = "pages/fonts/Mvlhohi bold.ttf"
 
 
 def get_asset_base64_uri(path):
     """Converts a local file (image or font) to a Base64 Data URI."""
     if not os.path.exists(path):
+        # Using a default error image for demonstration, but you must supply the files.
         st.error(f"❌ Error: Required file not found at path: **{path}**")
-        # Returning a placeholder to allow the rest of the app to load for easier debugging
-        return "" 
+        return None
     try:
         with open(path, "rb") as file:
             encoded_string = base64.b64encode(file.read()).decode()
@@ -28,6 +27,7 @@ def get_asset_base64_uri(path):
                 mime_type = 'image/png' 
             elif path.lower().endswith(('.jpg', '.jpeg')):
                 mime_type = 'image/jpeg'
+            # Check for font MIME types
             elif path.lower().endswith(('.ttf', '.otf', '.woff', '.woff2')):
                 mime_type = 'font/ttf' 
             else:
@@ -35,11 +35,13 @@ def get_asset_base64_uri(path):
             return f"data:{mime_type};base64,{encoded_string}"
     except Exception as e:
         st.error(f"❌ Error reading or encoding file **{path}**: {e}")
-        return ""
+        return None
 
-# Convert all assets to Base64
+# Convert all image assets to Base64
 MAP_IMAGE_DATA_URI = get_asset_base64_uri(MAP_FILE_PATH)
 EMBLEM_IMAGE_DATA_URI = get_asset_base64_uri(EMBLEM_FILE_PATH)
+
+# Convert all font assets to Base64 (needed for CSS @font-face rule inside HTML)
 FARUMA_FONT_DATA_URI = get_asset_base64_uri(FARUMA_FONT_PATH)
 MVLHOHI_FONT_DATA_URI = get_asset_base64_uri(MVLHOHI_FONT_PATH)
 
@@ -51,25 +53,16 @@ st.set_page_config(
     layout="wide"
 )
 
-# 🚀 CSS to Remove Top Space and HIDE TOP-RIGHT ICONS
+# 🚀 AGGRESSIVE TOP-SPACE REMOVAL: Uses negative margin to pull content up.
 st.markdown("""
     <style>
-    /* 1. Hides the "Share, Star, Edit, GitHub, and 3-dot Menu" in the top-right corner */
-    div[data-testid="stToolbar"] {
-        visibility: hidden;
-        height: 0px;
-    }
-    div[data-testid="stToolbar"] > div:first-child {
-        visibility: visible; /* Optionally keep Streamlit's default hamburger menu */
-    }
-    
-    /* 2. Targets the main content block container to remove top padding */
+    /* Targets the main content block container */
     .block-container {
         padding-top: 0rem; /* Remove default top padding */
         margin-top: -50px; /* Pull the content aggressively up into the default header area */
         max-width: 100%; /* Ensure wide layout is respected */
     }
-    /* 3. Targets the inner block that contains the components to pull it up */
+    /* Targets the inner block that contains the components to pull it up */
     .css-1r6bpt { 
         padding-top: 0; 
     }
@@ -79,11 +72,13 @@ st.markdown("""
 
 # --- 2. EMBEDDED HTML/CSS/JS GENERATOR ---
 
-if not all([MAP_IMAGE_DATA_URI, EMBLEM_IMAGE_DATA_URI, FARUMA_FONT_DATA_URI, MVLHOHI_FONT_DATA_URI]):
-    st.warning("⚠️ Some required assets could not be loaded. Check file names and paths in Section 0 of the script. The app may not display correctly.")
-    # We still proceed to display the components.html below so the user can debug the layout.
+if any(uri is None for uri in [MAP_IMAGE_DATA_URI, EMBLEM_IMAGE_DATA_URI, FARUMA_FONT_DATA_URI, MVLHOHI_FONT_DATA_URI]):
+    st.warning("Please resolve the file path errors for the images/fonts listed above before running the tool.")
+    st.stop()
+
 
 # Define the massive HTML/CSS/JS block using f-string and triple quotes
+# IMPORTANT: Updated the font URIs in the HTML @font-face rule.
 HTML_GENERATOR = f"""
 <!DOCTYPE html>
 <html lang="en">
@@ -95,6 +90,10 @@ HTML_GENERATOR = f"""
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <style>
+    /* Add CSS variables for flexible control */
+    :root {{
+    }}
+
     /* --- Base layout and fonts --- */
     body {{
         font-family: Arial, sans-serif;
@@ -107,7 +106,7 @@ HTML_GENERATOR = f"""
     }}
     
     /* ========================================
-    *** FONT DEFINITIONS (Using Base64 URIs) ***
+    *** FONT DEFINITIONS (UPDATED WITH BASE64 URIs) ***
     ======================================== */
     @font-face {{
         font-family: 'Faruma';
@@ -145,9 +144,9 @@ HTML_GENERATOR = f"""
     
     /* Advisory Textareas (Auto-resizing) */
     .advisory-textarea {{ 
-        min-height: 25px; 
+        min-height: 25px; /* Ensures minimum one-line height */
         height: auto; 
-        overflow-y: hidden; 
+        overflow-y: hidden; /* Hides scrollbar */
         resize: none; 
     }}
 
@@ -203,17 +202,17 @@ HTML_GENERATOR = f"""
     /* --- Advisory section (Base style) --- */
     .advisory-section {{
         background-color: #fffde7; 
-        border-radius: 8px; 
+        border-radius: 8px; /* Added: Slightly more rounded */
         margin: 5px 0 5px 0; 
-        padding: 5px 15px; 
+        padding: 5px 15px; /* Adjusted padding: 5px top/bottom, 15px left/right */
         display: none; 
         overflow: hidden; 
     }}
     
     /* --- Advisory Red Styling (From user request) --- */
     .red-advisory-style {{
-        background-color: #b30000; 
-        border: none; 
+        background-color: #b30000; /* Darker, solid red background */
+        border: none; /* Removed the border to make it a solid block */
     }}
     
     .red-advisory-style .advisory-dv p, 
@@ -221,12 +220,12 @@ HTML_GENERATOR = f"""
     .red-advisory-style .advisory-en p, 
     .red-advisory-style .advisory-en span {{
         color: white !important; 
-        font-weight: bold; 
+        font-weight: bold; /* Added: Makes the text bold */
     }}
     
     .advisory-en p, .advisory-dv p {{
         font-size: 0.95em;
-        margin: 0; 
+        margin: 0; /* Ensures no extra vertical space around text */
         line-height: 1.4em;
         display: block; 
         width: 100%;
@@ -334,7 +333,7 @@ HTML_GENERATOR = f"""
     <div class="datetime-group">
         <div class="input-item">
             <label for="date-input">Date</label>
-            <input type="date" id="date-input" value="2025-11-11" onchange="updatePost()">
+            <input type="date" id="date-input" value="2025-11-10" onchange="updatePost()">
         </div>
         <div class="input-item">
             <label for="time-select">Valid Until Time (hrs)</label>
@@ -670,7 +669,6 @@ HTML_GENERATOR = f"""
     function initializeEditor() {{
         populateTimeSelect();
         
-        // Use current date for initialization
         const now = new Date();
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
