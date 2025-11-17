@@ -15,7 +15,7 @@ warnings.filterwarnings("ignore", message="not compatible with tight_layout")
 # --- Load shapefile ---
 # NOTE: Replace with your actual path if running locally
 # For a deployed app, consider moving the file and adjusting the path
-shp = r"C:\Users\thahumeena.MMS\Desktop\Shape_File\Atoll_boundary2016.shp"
+shp = shp = 'data/Atoll_boundary2016.shp'
 try:
     gdf = gpd.read_file(shp).to_crs(epsg=4326)
 except Exception as e:
@@ -157,5 +157,6 @@ with st.spinner('Generating map...'):
         file_name="Temperature_Outlook_Map.png",
         mime="image/png"
     )
+
 
 st.success("✅ Map displayed. **Changes in the sidebar update the map automatically.**")
