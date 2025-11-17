@@ -39,7 +39,7 @@ st.markdown("Use the sidebar to adjust the forecasted category and probability f
 
 # --- Data Loading and Preprocessing ---
 # ✅ Using the corrected lowercase path to match the file system
-shp = 'data/atoll_boundary2016.shp' 
+shp = 'data/Atoll_boundary2016.shp' 
 bbox = box(71, -1, 75, 7.5)
 
 try:
@@ -168,3 +168,4 @@ st.download_button(
     file_name='rainfall_outlook_map.png',
     mime='image/png'
 )
+
