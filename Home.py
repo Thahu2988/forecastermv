@@ -31,7 +31,7 @@ with col2:
     st.header("🌡️ Temperature Analysis")
     st.info("Explore global or local temperature variations and trends.")
     if st.button("Go to Temperature", key="btn_temp", use_container_width=True):
-        st.switch_page("temperature") # Assuming this file is pages/temperature.py
+        st.switch_page("Temperature_Outlook.py") # Assuming this file is pages/temperature.py
 
 with col3:
     st.header("📞 Viber CST Analysis")
@@ -40,3 +40,4 @@ with col3:
         st.switch_page("viber_cst") # Assuming this file is pages/viber_cst.py
 
 st.divider()
+
