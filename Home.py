@@ -1,5 +1,9 @@
 # Home.py
-
+# Home.py
+import streamlit as st
+from config import app_setup # <--- This line must succeed
+app_setup("Geospatial Data Explorer") 
+# ... rest of the code ...
 import streamlit as st
 from config import app_setup # Import your shared setup function
 
@@ -37,3 +41,4 @@ with col3:
         st.switch_page("pages.viber_cst") # ✅ Corrected path
 
 st.divider()
+
