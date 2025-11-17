@@ -1,50 +1,56 @@
-import streamlit as st 
+# Home.py
+import streamlit as st
 
-# ---------------------------
-# 1. HIDE STREAMLIT UI & PUSH CONTENT DOWN
-# ---------------------------
-hide_streamlit_style = """
+# --- Configuration ---
+st.set_page_config(
+    page_title="My Geospatial Data App",
+    page_icon="🌍",
+    layout="wide"
+)
+
+# --- 1. Hide the Streamlit Menu/Toolbar (Addresses your request) ---
+# This CSS snippet targets the specific elements that typically contain the "Share/Star/Settings" menu
+hide_menu_style = """
     <style>
-    /* HIDE DEFAULT STREAMLIT ELEMENTS */
-    /* Hide the hamburger/ellipsis menu in the top right */
-    #MainMenu {visibility: hidden !important;} 
-    /* Hide the footer ("Made with Streamlit") */
-    footer {visibility: hidden !important;}
-    /* Hide the default Streamlit header/toolbar (which contains the Share button) */
-    .stApp > header {visibility: hidden !important;} 
-    
-    /* PUSH MAIN CONTENT DOWN */
-    /* This rule targets the main container where your app content lives. 
-       Adjust the 'padding-top' value to push the content down 
-       and hide the default top bar behind your custom header or just into the margin. 
-       If you are using a custom header, this padding should match the custom header's height. 
-       We use a large value here (e.g., 50px) to ensure the top bar is hidden. */
-    .stApp > div:first-child > section {
-        padding-top: 50px !important;
-    }
-    
-    /* ENSURE SIDEBAR TOGGLE IS VISIBLE & ON TOP */
-    /* The sidebar toggle is part of the stDecoration container. 
-       We ensure it's visible and highly elevated. */
-    [data-testid="stDecoration"] {
-        visibility: visible !important;
-        z-index: 999999 !important; /* Keep it on top of everything */
-    }
-
-    /* Clean up residual custom fixed header styles if you are no longer using them */
-    /* If you still use the 'custom-fixed-header' you must keep these rules */
-    .custom-fixed-header {
-        /* ... existing custom header styles ... */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1000;
-        /* ... other styles ... */
-    }
-    
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
     </style>
-"""
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+    """
+st.markdown(hide_menu_style, unsafe_allow_html=True)
+# 
 
-# ... rest of your Streamlit app code ...
+# --- 2. Home Page Content and Navigation ---
+st.title("🌍 Geospatial Data Explorer")
+
+st.markdown("""
+Welcome to the Geospatial Data Explorer. Use the links below or the **sidebar navigation** to access different analyses.
+""")
+
+st.divider()
+
+col1, col2, col3 = st.columns(3)
+
+# Note: st.switch_page uses ONLY the filename (e.g., "rainfall.py")
+# when navigating to a file inside the 'pages' directory.
+
+with col1:
+    st.header("💧 Rainfall Analysis")
+    st.info("View maps and charts related to rainfall data.")
+    if st.button("Go to Rainfall", key="btn_rainfall", use_container_width=True):
+        st.switch_page("rainfall.py") # CORRECTED path
+
+with col2:
+    st.header("🌡️ Temperature Analysis")
+    st.info("Explore global or local temperature variations and trends.")
+    if st.button("Go to Temperature", key="btn_temp", use_container_width=True):
+        st.switch_page("temperature.py") # CORRECTED path
+
+with col3:
+    st.header("📞 Viber CST Analysis")
+    st.info("Visualize data related to Viber communication traffic.")
+    if st.button("Go to Viber CST", key="btn_viber", use_container_width=True):
+        st.switch_page("viber_cst.py") # CORRECTED path
+
+st.divider()
+
