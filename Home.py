@@ -29,7 +29,7 @@ with tab1:
     st.info("Click the button below to view and adjust the Rainfall Outlook Map.")
     if st.button("Go to Rainfall Map", key="btn_rainfall_tab", type="primary", use_container_width=True):
         # This still requires pages/Rainfall_Outlook.py to be registered
-        st.switch_pages("Rainfall_Outlook.py") 
+        st.switch_pages("Rainfall_Outlook") 
 
 # Tab 2: Temperature Analysis
 with tab2:
@@ -46,5 +46,6 @@ with tab3:
         st.switch_page("viber_cst") 
 
 st.divider()
+
 
 
