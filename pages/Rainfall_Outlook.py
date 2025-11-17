@@ -1,5 +1,9 @@
+# pages/rainfall.py
+
+# --- Imports and Setup ---
 from config import app_setup
-app_setup("Forecasters' Tools")
+app_setup("Forecasters' Tools") # Applies custom setup and title for this page
+
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,20 +14,32 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import streamlit as st
 from io import BytesIO
 
+# --- Page Title ---
+st.title("💧 Maximum Rainfall Outlook Map")
+st.markdown("Use the sidebar to adjust the forecasted category and probability for each atoll.")
+
+# --- Data Loading and Preprocessing ---
 # Load shapefile and clip extent
-shp = 'data/Atoll_boundary2016.shp'
-gdf = gpd.read_file(shp).to_crs(epsg=4326)
+shp = 'data/Atoll_boundary2016.shp' # Assuming your shapefile is in a 'data' folder
+try:
+    gdf = gpd.read_file(shp).to_crs(epsg=4326)
+except Exception as e:
+    st.error(f"Error loading shapefile from {shp}. Please check the file path and directory structure: {e}")
+    st.stop()
+    
 bbox = box(71, -1, 75, 7.5)
 gdf = gdf[gdf.intersects(bbox)]
 
 # ✅ Clean missing or invalid atoll names
 gdf['Name'] = gdf['Name'].fillna("Unknown")
-# or to skip missing ones: gdf = gdf.dropna(subset=['Name'])
 
 # ✅ Ensure unique atoll names
 unique_atolls = sorted(gdf['Name'].unique().tolist())
 
+# --- Sidebar Inputs (Atoll Selection) ---
+
 # Editable map title (sidebar)
+st.sidebar.write("### ✏️ Map Settings")
 map_title = st.sidebar.text_input("Edit Map Title:", "Maximum Rainfall Outlook for OND 2025")
 
 # Categories for each atoll
@@ -39,13 +55,22 @@ selected_percentages = {}
 
 # Sidebar inputs for each unique atoll
 for i, atoll in enumerate(unique_atolls):
-    selected = st.sidebar.selectbox(f"{atoll} Category", categories, index=1, key=f"{atoll}_cat_{i}")
-    percent = st.sidebar.slider(f"{atoll} %", min_value=0, max_value=100, value=60, step=5, key=f"{atoll}_perc_{i}")
+    # Use columns for a slightly cleaner layout in the sidebar
+    col_cat, col_perc = st.sidebar.columns([0.6, 0.4])
+
+    with col_cat:
+        selected = st.selectbox(
+            f"{atoll} Category", categories, index=1, key=f"{atoll}_cat_{i}", label_visibility="collapsed"
+        )
+    with col_perc:
+        percent = st.slider(
+            f"{atoll} %", min_value=0, max_value=100, value=60, step=5, key=f"{atoll}_perc_{i}", label_visibility="collapsed"
+        )
     
     selected_categories[atoll] = selected
     selected_percentages[atoll] = percent
 
-# Map category colors
+# --- Color Mapping and Normalization ---
 cmap_below = ListedColormap([
     '#ffffff', '#ffed5c', '#ffb833', '#ff8f00', '#f15c00', '#e20000'
 ])
@@ -66,7 +91,7 @@ tick_labels = ['35', '45', '55', '65', '75']
 gdf['category'] = gdf['Name'].map(selected_categories)
 gdf['prob'] = gdf['Name'].map(selected_percentages)
 
-# Plotting
+# --- Plotting Setup ---
 fig, ax = plt.subplots(figsize=(12, 10))
 
 # Plot each category with its respective color map
@@ -113,12 +138,13 @@ make_cb(ax, cmap_below, "Below Normal", 0)
 
 plt.tight_layout()
 
-# Save and display
+# --- Display and Download ---
+st.pyplot(fig)
+
+# Save figure to buffer for download
 buf = BytesIO()
 plt.savefig(buf, format='png')
 buf.seek(0)
-
-st.pyplot(fig)
 
 # Download button
 st.download_button(
@@ -127,5 +153,3 @@ st.download_button(
     file_name='rainfall_outlook_map.png',
     mime='image/png'
 )
-
-
