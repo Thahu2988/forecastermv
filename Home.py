@@ -1,4 +1,4 @@
-# Home.py
+# Home.py (TEMPORARY TEST SCRIPT)
 
 import streamlit as st
 from config import app_setup 
@@ -7,40 +7,30 @@ from config import app_setup
 app_setup("Geospatial Data Explorer") 
 
 # --- Home Page Content ---
-st.title("🌍 Geospatial Data Explorer")
-
-st.markdown("""
-Welcome to the Geospatial Data Explorer. Select a tool below or use the sidebar navigation.
-""")
-
+st.title("🌍 Geospatial Data Explorer - Navigation Test")
+st.markdown("Click the 'Navigation Test' tab and the button to verify page switching works.")
 st.divider()
 
 # --- Navigation using Tabs ---
+# Use the same tab structure, but link the first tab to the safe test page
 tab1, tab2, tab3 = st.tabs([
-    "💧 Rainfall Analysis", 
-    "🌡️ Temperature Analysis", 
-    "📞 Viber CST Analysis"
+    "🧪 Navigation Test",   # Renamed for clarity
+    "🌡️ Temperature Analysis (Disabled)", 
+    "📞 Viber CST Analysis (Disabled)"
 ])
 
-# Tab 1: Rainfall Analysis
+# Tab 1: Navigation Test
 with tab1:
-    st.info("View and adjust the Maximum Rainfall Outlook Map.")
-    if st.button("Go to Rainfall Map", key="btn_rainfall_tab", type="primary", use_container_width=True):
-        # Correct function name and page file name
-        st.switch_page("Rainfall_Outlook") 
+    st.info("Click the button below to switch to the safe 'Test_Page1'.")
+    if st.button("Go to Test Page 1", key="btn_test_page", type="primary", use_container_width=True):
+        # We switch to the simple page that is guaranteed not to crash.
+        st.switch_page("Test_Page1") 
 
-# Tab 2: Temperature Analysis
+# Tab 2 & 3: Disabled to avoid crashing pages
 with tab2:
-    st.info("Explore global or local temperature variations and trends.")
-    if st.button("Go to Temperature Tool", key="btn_temp_tab", use_container_width=True):
-        # Correct function name and assumed page file name
-        st.switch_page("Temperature_Outlook") 
+    st.warning("Feature disabled for testing.")
 
-# Tab 3: Viber CST Analysis
 with tab3:
-    st.info("Visualize data related to Viber communication traffic.")
-    if st.button("Go to Viber CST Tool", key="btn_viber_tab", use_container_width=True):
-        # Correct function name and assumed page file name
-        st.switch_page("viberfcst_final") 
+    st.warning("Feature disabled for testing.")
 
 st.divider()
