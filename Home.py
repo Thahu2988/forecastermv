@@ -19,25 +19,26 @@ st.divider()
 # --- Navigation Buttons ---
 col1, col2, col3 = st.columns(3)
 
-# The switch_page call MUST match the filename in the pages/ directory 
-# (Rainfall_Outlook.py) exactly, excluding the .py extension.
 with col1:
     st.header("💧 Rainfall Analysis")
     st.info("View maps and charts related to rainfall data.")
     if st.button("Go to Rainfall", key="btn_rainfall", use_container_width=True):
-        st.switch_page("Rainfall_Outlook") # ✅ Corrected to match the filename
+        # ✅ Correct: Matches pages/Rainfall_Outlook.py without the extension
+        st.switch_page("Rainfall_Outlook") 
 
 with col2:
     st.header("🌡️ Temperature Analysis")
     st.info("Explore global or local temperature variations and trends.")
     if st.button("Go to Temperature", key="btn_temp", use_container_width=True):
-        st.switch_page("Temperature_Outlook.py") # Assuming this file is pages/temperature.py
+        # ❌ FIX: Removed the incorrect '.py' extension. 
+        # Assumes the file in pages/ is named 'Temperature_Outlook.py'
+        st.switch_page("Temperature_Outlook") 
 
 with col3:
     st.header("📞 Viber CST Analysis")
     st.info("Visualize data related to Viber communication traffic.")
     if st.button("Go to Viber CST", key="btn_viber", use_container_width=True):
-        st.switch_page("viber_cst") # Assuming this file is pages/viber_cst.py
+        # Assumes the file in pages/ is named 'viber_cst.py'
+        st.switch_page("viber_cst") 
 
 st.divider()
-
