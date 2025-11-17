@@ -1,5 +1,8 @@
 # Home.py (TEMPORARY TEST SCRIPT)
-
+# Home.py
+from config import app_setup 
+app_setup("Geospatial Data Explorer") # Must be the very first lines!
+# ... rest of the imports and code
 import streamlit as st
 from config import app_setup 
 
@@ -34,3 +37,4 @@ with tab3:
     st.warning("Feature disabled for testing.")
 
 st.divider()
+
