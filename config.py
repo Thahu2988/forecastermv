@@ -1,12 +1,6 @@
-# config.py
-
+# BAD config.py
 import streamlit as st
+import numpy as np  # <-- THIS CRASHES THE APP if numpy isn't installed yet
 
 def app_setup(title):
-    st.set_page_config(
-        page_title=title,
-        layout="wide",
-        # Use an emoji for the icon if you don't have a static one configured
-        page_icon="🌍" 
-    )
-    # You might also put sidebar elements here that are common to all pages
+    # ...
