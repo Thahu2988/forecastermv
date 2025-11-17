@@ -2,4 +2,6 @@ streamlit
 geopandas
 matplotlib
 numpy
-shapely
+pandas
+# Add other necessary spatial dependencies if they are not included 
+# automatically by geopandas (e.g., fiona, pyproj, shapely)
