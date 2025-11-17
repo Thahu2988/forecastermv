@@ -16,8 +16,6 @@ Welcome to the Geospatial Data Explorer. Select a tool below to begin your analy
 st.divider()
 
 # --- Navigation using Tabs ---
-
-# Define the tabs structure
 tab1, tab2, tab3 = st.tabs([
     "💧 Rainfall Analysis", 
     "🌡️ Temperature Analysis", 
@@ -28,24 +26,21 @@ tab1, tab2, tab3 = st.tabs([
 with tab1:
     st.info("Click the button below to view and adjust the Rainfall Outlook Map.")
     if st.button("Go to Rainfall Map", key="btn_rainfall_tab", type="primary", use_container_width=True):
-        # This still requires pages/Rainfall_Outlook.py to be registered
-        st.switch_pages("Rainfall_Outlook") 
+        # Correct function and correct filename
+        st.switch_page("Rainfall_Outlook") 
 
 # Tab 2: Temperature Analysis
 with tab2:
     st.info("Click the button below to explore temperature variations and trends.")
     if st.button("Go to Temperature Tool", key="btn_temp_tab", use_container_width=True):
-        # Assumes the file is pages/Temperature_Outlook.py
+        # Correct function and correct filename
         st.switch_page("Temperature_Outlook") 
 
 # Tab 3: Viber CST Analysis
 with tab3:
     st.info("Click the button below to visualize Viber communication traffic data.")
     if st.button("Go to Viber CST Tool", key="btn_viber_tab", use_container_width=True):
-        # Assumes the file is pages/viber_cst.py
-        st.switch_page("viber_cst") 
+        # 🔥 FIX: Corrected to match the actual filename: viberfcst_final.py
+        st.switch_page("viberfcst_final") 
 
 st.divider()
-
-
-
