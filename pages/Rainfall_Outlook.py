@@ -1,4 +1,4 @@
-# pages/rainfall.py
+# pages/Rainfall_Outlook.py
 
 # --- Imports and Setup ---
 from config import app_setup
@@ -14,26 +14,42 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import streamlit as st
 from io import BytesIO
 
+# --- Caching the expensive data load operation ---
+# Caching ensures the shapefile is only read once, speeding up the app significantly.
+@st.cache_data
+def load_data(shp_path, clip_bbox):
+    """Loads, clips, and preprocesses the geospatial data."""
+    # Load shapefile and clip extent
+    try:
+        # ⚠️ NOTE: This will fail if the required .shx, .dbf, and .prj files 
+        # are not alongside the .shp file in the 'data/' folder.
+        gdf = gpd.read_file(shp_path).to_crs(epsg=4326)
+    except Exception as e:
+        # Raise an exception to be caught by the calling function or Streamlit's run loop
+        raise FileNotFoundError(f"Failed to load geospatial data: {e}")
+        
+    gdf = gdf[gdf.intersects(clip_bbox)]
+    
+    # Clean missing or invalid atoll names
+    gdf['Name'] = gdf['Name'].fillna("Unknown")
+
+    return gdf
+
 # --- Page Title ---
 st.title("💧 Maximum Rainfall Outlook Map")
 st.markdown("Use the sidebar to adjust the forecasted category and probability for each atoll.")
 
 # --- Data Loading and Preprocessing ---
-# Load shapefile and clip extent
 shp = 'data/Atoll_boundary2016.shp' # Assuming your shapefile is in a 'data' folder
-try:
-    gdf = gpd.read_file(shp).to_crs(epsg=4326)
-except Exception as e:
-    st.error(f"Error loading shapefile from {shp}. Please check the file path and directory structure: {e}")
-    st.stop()
-    
 bbox = box(71, -1, 75, 7.5)
-gdf = gdf[gdf.intersects(bbox)]
 
-# ✅ Clean missing or invalid atoll names
-gdf['Name'] = gdf['Name'].fillna("Unknown")
+try:
+    gdf = load_data(shp, bbox)
+except FileNotFoundError as e:
+    st.error(f"Error loading map data. Please check the 'data/' directory: {e}")
+    st.stop() # Stop execution if data load fails
 
-# ✅ Ensure unique atoll names
+# ✅ Ensure unique atoll names are calculated *after* loading
 unique_atolls = sorted(gdf['Name'].unique().tolist())
 
 # --- Sidebar Inputs (Atoll Selection) ---
