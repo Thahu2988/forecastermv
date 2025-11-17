@@ -1,3 +1,10 @@
+# pages/Rainfall_Outlook.py
+
+# --- Imports and Setup ---
+# Assuming app_setup sets st.set_page_config and other initial settings
+from config import app_setup 
+app_setup("Forecasters' Tools") 
+
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,20 +15,50 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 import streamlit as st
 from io import BytesIO
 
-# Load shapefile and clip extent
-shp = shp = 'data/Atoll_boundary2016.shp'
-gdf = gpd.read_file(shp).to_crs(epsg=4326)
-bbox = box(71, -1, 75, 7.5)
-gdf = gdf[gdf.intersects(bbox)]
+# --- Caching the expensive data load operation (CRITICAL FIX) ---
+@st.cache_data
+def load_and_preprocess_data():
+    """Loads, clips, and preprocesses the geospatial data. Runs only once."""
+    # ⚠️ Use the case that matches your repository files (mixed case)
+    # The full filename including the directory structure is used.
+    shp = 'data/Atoll_boundary2016.shp' 
+    
+    try:
+        # Load shapefile and project to WGS84
+        gdf = gpd.read_file(shp).to_crs(epsg=4326)
+    except Exception as e:
+        # Raise an exception to be caught by the main script for better error reporting
+        raise FileNotFoundError(f"Failed to load geospatial data from {shp}: {e}")
+        
+    # Clip extent
+    bbox = box(71, -1, 75, 7.5)
+    gdf = gdf[gdf.intersects(bbox)]
 
-# ✅ Clean missing or invalid atoll names
-gdf['Name'] = gdf['Name'].fillna("Unknown")
-# or to skip missing ones: gdf = gdf.dropna(subset=['Name'])
+    # Clean missing or invalid atoll names
+    gdf['Name'] = gdf['Name'].fillna("Unknown")
 
-# ✅ Ensure unique atoll names
+    return gdf
+
+# --- Page Title ---
+st.title("💧 Maximum Rainfall Outlook Map")
+st.markdown("Use the sidebar to adjust the forecasted category and probability for each atoll.")
+
+# --- Data Loading and Preprocessing ---
+try:
+    # Load data using the cached function
+    gdf = load_and_preprocess_data()
+except FileNotFoundError as e:
+    st.error(f"Error loading map data: {e}")
+    # Display the error but continue to allow the app to be debugged.
+    st.stop() 
+
+# Ensure unique atoll names
 unique_atolls = sorted(gdf['Name'].unique().tolist())
 
+# --- Sidebar Inputs (Atoll Selection) ---
+
 # Editable map title (sidebar)
+st.sidebar.write("### ✏️ Map Settings")
 map_title = st.sidebar.text_input("Edit Map Title:", "Maximum Rainfall Outlook for OND 2025")
 
 # Categories for each atoll
@@ -37,13 +74,22 @@ selected_percentages = {}
 
 # Sidebar inputs for each unique atoll
 for i, atoll in enumerate(unique_atolls):
-    selected = st.sidebar.selectbox(f"{atoll} Category", categories, index=1, key=f"{atoll}_cat_{i}")
-    percent = st.sidebar.slider(f"{atoll} %", min_value=0, max_value=100, value=60, step=5, key=f"{atoll}_perc_{i}")
+    # Use columns for a slightly cleaner layout in the sidebar
+    col_cat, col_perc = st.sidebar.columns([0.6, 0.4])
+
+    with col_cat:
+        selected = st.selectbox(
+            f"{atoll} Category", categories, index=1, key=f"{atoll}_cat_{i}", label_visibility="collapsed"
+        )
+    with col_perc:
+        percent = st.slider(
+            f"{atoll} %", min_value=0, max_value=100, value=60, step=5, key=f"{atoll}_perc_{i}", label_visibility="collapsed"
+        )
     
     selected_categories[atoll] = selected
     selected_percentages[atoll] = percent
 
-# Map category colors
+# --- Color Mapping and Normalization ---
 cmap_below = ListedColormap([
     '#ffffff', '#ffed5c', '#ffb833', '#ff8f00', '#f15c00', '#e20000'
 ])
@@ -60,11 +106,11 @@ norm = BoundaryNorm(bins, ncolors=len(bins)-1, clip=True)
 tick_positions = [35, 45, 55, 65, 75]
 tick_labels = ['35', '45', '55', '65', '75']
 
-# ✅ Map selections back to gdf (so all parts of same atoll share same values)
+# Map selections back to gdf (so all parts of same atoll share same values)
 gdf['category'] = gdf['Name'].map(selected_categories)
 gdf['prob'] = gdf['Name'].map(selected_percentages)
 
-# Plotting
+# --- Plotting Setup ---
 fig, ax = plt.subplots(figsize=(12, 10))
 
 # Plot each category with its respective color map
@@ -104,19 +150,20 @@ def make_cb(ax, cmap, title, offset):
     cax.set_title(title, fontsize=10, pad=6)
     cb.ax.tick_params(labelsize=9, pad=2)
 
-# ✅ Rearranged order — Above on top, Normal middle, Below bottom
+# Rearranged order — Above on top, Normal middle, Below bottom
 make_cb(ax, cmap_above, "Above Normal", 2 * spacing)
 make_cb(ax, cmap_normal, "Normal", spacing)
 make_cb(ax, cmap_below, "Below Normal", 0)
 
 plt.tight_layout()
 
-# Save and display
+# --- Display and Download ---
+st.pyplot(fig)
+
+# Save figure to buffer for download
 buf = BytesIO()
 plt.savefig(buf, format='png')
 buf.seek(0)
-
-st.pyplot(fig)
 
 # Download button
 st.download_button(
@@ -125,4 +172,3 @@ st.download_button(
     file_name='rainfall_outlook_map.png',
     mime='image/png'
 )
-
