@@ -4,43 +4,45 @@ import streamlit as st
 from config import app_setup # Import your shared setup function
 
 # --- Configuration ---
-# Applies the custom page setup, layout, and CSS defined in config.py
 app_setup("Geospatial Data Explorer") 
 
 # --- Home Page Content ---
 st.title("🌍 Geospatial Data Explorer")
 
 st.markdown("""
-Welcome to the Geospatial Data Explorer. Use the links below or the **sidebar navigation** to access different analyses.
+Welcome to the Geospatial Data Explorer. Select a tool below to begin your analysis.
 """)
 
 st.divider()
 
-# --- Navigation Buttons ---
-col1, col2, col3 = st.columns(3)
+# --- Navigation using Tabs ---
 
-# The argument in st.switch_page must match the filename in the pages/ directory 
-# *exactly*, but without the .py extension.
+# Define the tabs structure
+tab1, tab2, tab3 = st.tabs([
+    "💧 Rainfall Analysis", 
+    "🌡️ Temperature Analysis", 
+    "📞 Viber CST Analysis"
+])
 
-with col1:
-    st.header("💧 Rainfall Analysis")
-    st.info("View maps and charts related to rainfall data.")
-    if st.button("Go to Rainfall", key="btn_rainfall", use_container_width=True):
-        # Uses the corrected filename: Rainfall_Outlook
+# Tab 1: Rainfall Analysis
+with tab1:
+    st.info("Click the button below to view and adjust the Rainfall Outlook Map.")
+    if st.button("Go to Rainfall Map", key="btn_rainfall_tab", type="primary", use_container_width=True):
+        # This still requires pages/Rainfall_Outlook.py to be registered
         st.switch_page("Rainfall_Outlook") 
 
-with col2:
-    st.header("🌡️ Temperature Analysis")
-    st.info("Explore global or local temperature variations and trends.")
-    if st.button("Go to Temperature", key="btn_temp", use_container_width=True):
-        # Uses the assumed filename: Temperature_Outlook
+# Tab 2: Temperature Analysis
+with tab2:
+    st.info("Click the button below to explore temperature variations and trends.")
+    if st.button("Go to Temperature Tool", key="btn_temp_tab", use_container_width=True):
+        # Assumes the file is pages/Temperature_Outlook.py
         st.switch_page("Temperature_Outlook") 
 
-with col3:
-    st.header("📞 Viber CST Analysis")
-    st.info("Visualize data related to Viber communication traffic.")
-    if st.button("Go to Viber CST", key="btn_viber", use_container_width=True):
-        # Uses the assumed filename: viber_cst
+# Tab 3: Viber CST Analysis
+with tab3:
+    st.info("Click the button below to visualize Viber communication traffic data.")
+    if st.button("Go to Viber CST Tool", key="btn_viber_tab", use_container_width=True):
+        # Assumes the file is pages/viber_cst.py
         st.switch_page("viber_cst") 
 
 st.divider()
