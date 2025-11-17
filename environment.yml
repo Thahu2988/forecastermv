@@ -1,0 +1,13 @@
+name: forecaster_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10  # Use a stable Python version
+  - streamlit
+  - geopandas
+  - matplotlib
+  - numpy
+  - pandas
+  # Conda-forge handles the complex C/C++ dependencies (GDAL, PROJ) 
+  # required by geopandas much more reliably than pip.
