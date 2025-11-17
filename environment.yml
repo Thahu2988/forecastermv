@@ -3,13 +3,9 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - python=3.10  # Use a stable Python version
+  - python=3.10  # <--- REMOVE THIS LINE
   - streamlit
   - geopandas
   - matplotlib
   - numpy
   - pandas
-  - python=3.9  # Streamlit often defaults to 3.9/3.10; 3.9 is extremely stable.
-  # Conda-forge handles the complex C/C++ libraries (GDAL, PROJ) 
-  # required by geopandas much more reliably than pip.
-
