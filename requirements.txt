@@ -1,7 +1,0 @@
-streamlit
-geopandas
-matplotlib
-numpy
-pandas
-# Add other necessary spatial dependencies if they are not included 
-# automatically by geopandas (e.g., fiona, pyproj, shapely)
