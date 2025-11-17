@@ -9,5 +9,5 @@ dependencies:
   - matplotlib
   - numpy
   - pandas
-  # Conda-forge handles the complex C/C++ dependencies (GDAL, PROJ) 
+  # Conda-forge handles the complex C/C++ libraries (GDAL, PROJ) 
   # required by geopandas much more reliably than pip.
